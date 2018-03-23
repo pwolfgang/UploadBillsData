@@ -48,16 +48,16 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 
 /**
- * This class is a Hibernate Data Access Object for the BillsData.
+ * This class is a Hibernate Data Access Object for the Bill.
  *
  * @author Paul Wolfgang
  */
-public class BillsDataDAO {
+public class BillDAO {
 
     /**
      * LOGGER for error reporting
      */
-    private static final Logger LOGGER = Logger.getLogger(BillsDataDAO.class);
+    private static final Logger LOGGER = Logger.getLogger(BillDAO.class);
 
     /**
      * Committee codes
@@ -86,7 +86,7 @@ public class BillsDataDAO {
      *
      * @param sessionFactory Mock SessionFactory object
      */
-    public BillsDataDAO(SessionFactory sessionFactory) {
+    public BillDAO(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -99,7 +99,7 @@ public class BillsDataDAO {
      * 
      * @param tableName The table to store the Bills_Data 
      */
-    public BillsDataDAO(String tableName) {
+    public BillDAO(String tableName) {
         Configuration configuration;
         try {
             configuration = new Configuration()
@@ -147,12 +147,12 @@ public class BillsDataDAO {
     /**
      * Method to set one of the endTransactiontee fields in a billData object
      *
-     * @param billData The BillsData object
+     * @param billData The Bill object
      * @param ctyCode The endTransactiontee code
      * @param isPrimary True from primary endTransactiontee, false for other endTransactiontees
      * @param value The value to be set
      */
-    public void setCommittee(BillsData billData, int ctyCode, boolean isPrimary, Integer value) {
+    public void setCommittee(Bill billData, int ctyCode, boolean isPrimary, Integer value) {
         String methodName;
         if (ctyCode != 300) {
             methodName = String.format("set$%3d%s", ctyCode, isPrimary ? "p" : "o");
@@ -160,7 +160,7 @@ public class BillsDataDAO {
             methodName = "set$300";
         }
         try {
-            Method method = BillsData.class.getMethod(methodName, Integer.class);
+            Method method = Bill.class.getMethod(methodName, Integer.class);
             method.invoke(billData, value);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             String message = String.format("Error setting committee %d%s in bill %s",
@@ -170,11 +170,11 @@ public class BillsDataDAO {
     }
 
     /**
-     * Method to clear all endTransactiontee fields in a BillsData object
+     * Method to clear all endTransactiontee fields in a Bill object
      *
-     * @param billData The BillsData object
+     * @param billData The Bill object
      */
-    public void clearAll(BillsData billData) {
+    public void clearAll(Bill billData) {
         for (int ctyCode : ctyCodes) {
             setCommittee(billData, ctyCode, true, 0);
             setCommittee(billData, ctyCode, false, 0);
@@ -188,15 +188,15 @@ public class BillsDataDAO {
      * and inserted into the database.
      *
      * @param billID The unique identifier
-     * @return The BillsData object
+     * @return The Bill object
      */
-    public BillsData getBill(String billID) {
+    public Bill getBill(String billID) {
         beginTransaction();
-        BillsData billsData = null;
+        Bill billsData = null;
         try {
-            billsData = session.get(BillsData.class, billID);
+            billsData = session.get(Bill.class, billID);
             if (billsData == null) {
-                billsData = new BillsData();
+                billsData = new Bill();
                 billsData.setId(billID);
                 session.save(billsData);
             }
@@ -216,10 +216,10 @@ public class BillsDataDAO {
     }
     
     /**
-     * Method to save a BillsData object back to the database
+     * Method to save a Bill object back to the database
      * @param billsData the bills data to be saved to the db
      */
-    public void save(BillsData billsData) {
+    public void save(Bill billsData) {
         session.save(billsData);
     }
 

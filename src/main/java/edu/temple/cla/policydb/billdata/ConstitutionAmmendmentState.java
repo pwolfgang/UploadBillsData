@@ -39,7 +39,7 @@ public class ConstitutionAmmendmentState implements State {
     private boolean rejected = false;
     private int finalState = NOT_A_CONSTITUTIONAL_AMMENDMENT;
 
-    public ConstitutionAmmendmentState(Bill bill) {
+    public ConstitutionAmmendmentState(BillData bill) {
         if (bill.getType().equals("B")
                 && bill.getSubtype().equals("J")) {
             finalState = NOT_PASSED;

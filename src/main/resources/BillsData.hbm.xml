@@ -1,432 +1,431 @@
-<?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated Apr 23, 2010 11:18:59 AM by Hibernate Tools 3.2.1.GA -->
 <hibernate-mapping>
-    <class name="edu.temple.cla.policydb.billshibernatedao.BillsData" table="Bills_Data" catalog="PAPolicy_Copy">
-        <id name="id" type="string">
-            <column name="ID" length="11" />
-            <generator class="assigned" />
-        </id>
-        <property name="chamber" type="java.lang.Short">
-            <column name="Chamber" />
-        </property>
-        <property name="session" type="string">
-            <column name="Session" length="10" />
-        </property>
-        <property name="bill" type="string">
-            <column name="Bill" length="50" />
-        </property>
-        <property name="subtype" type="string">
-            <column name="SubType" length="2" />
-        </property>
-        <property name="hyperlink" type="string">
-            <column name="Hyperlink" length="65535" />
-        </property>
-        <property name="sponsor" type="string">
-            <column name="Sponsor" />
-        </property>
-        <property name="sponsorParty" type="java.lang.Short">
-            <column name="Sponsor_Party" />
-        </property>
-        <property name="sponsorCounty" type="string">
-            <column name="Sponsor_County" length="50" />
-        </property>
-        <property name="sponsorTerms" type="string">
-            <column name="Sponsor_Terms" length="50" />
-        </property>
-        <property name="abstract_" type="string">
-            <column name="Abstract" length="65535" />
-        </property>
-        <property name="tax" type="java.lang.Integer">
-            <column name="Tax" />
-        </property>
-        <property name="eld" type="java.lang.Integer">
-            <column name="Eld" />
-        </property>
-        <property name="conAmmend" type="java.lang.Short">
-            <column name="Con_Ammend" />
-        </property>
-        <property name="actNo" type="string">
-            <column name="Act_No" length="4" />
-        </property>
-        <property name="dateEnacted" type="java.util.Date">
-            <column name="Date_Enacted" />
-        </property>
-        <property name="dayEnacted" type="java.lang.Short">
-            <column name="Day_Enacted" />
-        </property>
-        <property name="monthEnacted" type="java.lang.Short">
-            <column name="Month_Enacted" />
-        </property>
-        <property name="yearEnacted" type="java.lang.Short">
-            <column name="Year_Enacted" />
-        </property>
-        <property name="code" type="java.lang.Integer">
-            <column name="Code" />
-        </property>
-        <property name="commemorative" type="java.lang.Integer">
-            <column name="Commemorative" />
-        </property>
-        <property name="appropriations" type="java.lang.Integer">
-            <column name="Appropriations" />
-        </property>
-        <property name="$101p" type="java.lang.Integer">
-            <column name="_101P" />
-        </property>
-        <property name="$101o" type="java.lang.Integer">
-            <column name="_101O" />
-        </property>
-        <property name="$102p" type="java.lang.Integer">
-            <column name="_102P" />
-        </property>
-        <property name="$102o" type="java.lang.Integer">
-            <column name="_102O" />
-        </property>
-        <property name="$103p" type="java.lang.Integer">
-            <column name="_103P" />
-        </property>
-        <property name="$103o" type="java.lang.Integer">
-            <column name="_103O" />
-        </property>
-        <property name="$104p" type="java.lang.Integer">
-            <column name="_104P" />
-        </property>
-        <property name="$104o" type="java.lang.Integer">
-            <column name="_104O" />
-        </property>
-        <property name="$105p" type="java.lang.Integer">
-            <column name="_105P" />
-        </property>
-        <property name="$105o" type="java.lang.Integer">
-            <column name="_105O" />
-        </property>
-        <property name="$106p" type="java.lang.Integer">
-            <column name="_106P" />
-        </property>
-        <property name="$106o" type="java.lang.Integer">
-            <column name="_106O" />
-        </property>
-        <property name="$107p" type="java.lang.Integer">
-            <column name="_107P" />
-        </property>
-        <property name="$107o" type="java.lang.Integer">
-            <column name="_107O" />
-        </property>
-        <property name="$108p" type="java.lang.Integer">
-            <column name="_108P" />
-        </property>
-        <property name="$108o" type="java.lang.Integer">
-            <column name="_108O" />
-        </property>
-        <property name="$109p" type="java.lang.Integer">
-            <column name="_109P" />
-        </property>
-        <property name="$109o" type="java.lang.Integer">
-            <column name="_109O" />
-        </property>
-        <property name="$110p" type="java.lang.Integer">
-            <column name="_110P" />
-        </property>
-        <property name="$110o" type="java.lang.Integer">
-            <column name="_110O" />
-        </property>
-        <property name="$111p" type="java.lang.Integer">
-            <column name="_111P" />
-        </property>
-        <property name="$111o" type="java.lang.Integer">
-            <column name="_111O" />
-        </property>
-        <property name="$112p" type="java.lang.Integer">
-            <column name="_112P" />
-        </property>
-        <property name="$112o" type="java.lang.Integer">
-            <column name="_112O" />
-        </property>
-        <property name="$113p" type="java.lang.Integer">
-            <column name="_113P" />
-        </property>
-        <property name="$113o" type="java.lang.Integer">
-            <column name="_113O" />
-        </property>
-        <property name="$114p" type="java.lang.Integer">
-            <column name="_114P" />
-        </property>
-        <property name="$114o" type="java.lang.Integer">
-            <column name="_114O" />
-        </property>
-        <property name="$115p" type="java.lang.Integer">
-            <column name="_115P" />
-        </property>
-        <property name="$115o" type="java.lang.Integer">
-            <column name="_115O" />
-        </property>
-        <property name="$116p" type="java.lang.Integer">
-            <column name="_116P" />
-        </property>
-        <property name="$116o" type="java.lang.Integer">
-            <column name="_116O" />
-        </property>
-        <property name="$117p" type="java.lang.Integer">
-            <column name="_117P" />
-        </property>
-        <property name="$117o" type="java.lang.Integer">
-            <column name="_117O" />
-        </property>
-        <property name="$118p" type="java.lang.Integer">
-            <column name="_118P" />
-        </property>
-        <property name="$118o" type="java.lang.Integer">
-            <column name="_118O" />
-        </property>
-        <property name="$119p" type="java.lang.Integer">
-            <column name="_119P" />
-        </property>
-        <property name="$119o" type="java.lang.Integer">
-            <column name="_119O" />
-        </property>
-        <property name="$120p" type="java.lang.Integer">
-            <column name="_120P" />
-        </property>
-        <property name="$120o" type="java.lang.Integer">
-            <column name="_120O" />
-        </property>
-        <property name="$121p" type="java.lang.Integer">
-            <column name="_121P" />
-        </property>
-        <property name="$121o" type="java.lang.Integer">
-            <column name="_121O" />
-        </property>
-        <property name="$122p" type="java.lang.Integer">
-            <column name="_122P" />
-        </property>
-        <property name="$122o" type="java.lang.Integer">
-            <column name="_122O" />
-        </property>
-        <property name="$123p" type="java.lang.Integer">
-            <column name="_123P" />
-        </property>
-        <property name="$123o" type="java.lang.Integer">
-            <column name="_123O" />
-        </property>
-        <property name="$124p" type="java.lang.Integer">
-            <column name="_124P" />
-        </property>
-        <property name="$124o" type="java.lang.Integer">
-            <column name="_124O" />
-        </property>
-        <property name="$125p" type="java.lang.Integer">
-            <column name="_125P" />
-        </property>
-        <property name="$125o" type="java.lang.Integer">
-            <column name="_125O" />
-        </property>
-        <property name="$126p" type="java.lang.Integer">
-            <column name="_126P" />
-        </property>
-        <property name="$126o" type="java.lang.Integer">
-            <column name="_126O" />
-        </property>
-        <property name="$127p" type="java.lang.Integer">
-            <column name="_127P" />
-        </property>
-        <property name="$127o" type="java.lang.Integer">
-            <column name="_127O" />
-        </property>
-        <property name="$130p" type="java.lang.Integer">
-            <column name="_130P" />
-        </property>
-        <property name="$130o" type="java.lang.Integer">
-            <column name="_130O" />
-        </property>
-        <property name="$201p" type="java.lang.Integer">
-            <column name="_201P" />
-        </property>
-        <property name="$201o" type="java.lang.Integer">
-            <column name="_201O" />
-        </property>
-        <property name="$202p" type="java.lang.Integer">
-            <column name="_202P" />
-        </property>
-        <property name="$202o" type="java.lang.Integer">
-            <column name="_202O" />
-        </property>
-        <property name="$203p" type="java.lang.Integer">
-            <column name="_203P" />
-        </property>
-        <property name="$203o" type="java.lang.Integer">
-            <column name="_203O" />
-        </property>
-        <property name="$205p" type="java.lang.Integer">
-            <column name="_205P" />
-        </property>
-        <property name="$205o" type="java.lang.Integer">
-            <column name="_205O" />
-        </property>
-        <property name="$207p" type="java.lang.Integer">
-            <column name="_207P" />
-        </property>
-        <property name="$207o" type="java.lang.Integer">
-            <column name="_207O" />
-        </property>
-        <property name="$208p" type="java.lang.Integer">
-            <column name="_208P" />
-        </property>
-        <property name="$208o" type="java.lang.Integer">
-            <column name="_208O" />
-        </property>
-        <property name="$209p" type="java.lang.Integer">
-            <column name="_209P" />
-        </property>
-        <property name="$209o" type="java.lang.Integer">
-            <column name="_209O" />
-        </property>
-        <property name="$210p" type="java.lang.Integer">
-            <column name="_210P" />
-        </property>
-        <property name="$210o" type="java.lang.Integer">
-            <column name="_210O" />
-        </property>
-        <property name="$211p" type="java.lang.Integer">
-            <column name="_211P" />
-        </property>
-        <property name="$211o" type="java.lang.Integer">
-            <column name="_211O" />
-        </property>
-        <property name="$212p" type="java.lang.Integer">
-            <column name="_212P" />
-        </property>
-        <property name="$212o" type="java.lang.Integer">
-            <column name="_212O" />
-        </property>
-        <property name="$213p" type="java.lang.Integer">
-            <column name="_213P" />
-        </property>
-        <property name="$213o" type="java.lang.Integer">
-            <column name="_213O" />
-        </property>
-        <property name="$214p" type="java.lang.Integer">
-            <column name="_214P" />
-        </property>
-        <property name="$214o" type="java.lang.Integer">
-            <column name="_214O" />
-        </property>
-        <property name="$215p" type="java.lang.Integer">
-            <column name="_215P" />
-        </property>
-        <property name="$215o" type="java.lang.Integer">
-            <column name="_215O" />
-        </property>
-        <property name="$216p" type="java.lang.Integer">
-            <column name="_216P" />
-        </property>
-        <property name="$216o" type="java.lang.Integer">
-            <column name="_216O" />
-        </property>
-        <property name="$217p" type="java.lang.Integer">
-            <column name="_217P" />
-        </property>
-        <property name="$217o" type="java.lang.Integer">
-            <column name="_217O" />
-        </property>
-        <property name="$219p" type="java.lang.Integer">
-            <column name="_219P" />
-        </property>
-        <property name="$219o" type="java.lang.Integer">
-            <column name="_219O" />
-        </property>
-        <property name="$221p" type="java.lang.Integer">
-            <column name="_221P" />
-        </property>
-        <property name="$221o" type="java.lang.Integer">
-            <column name="_221O" />
-        </property>
-        <property name="$222p" type="java.lang.Integer">
-            <column name="_222P" />
-        </property>
-        <property name="$222o" type="java.lang.Integer">
-            <column name="_222O" />
-        </property>
-        <property name="$224p" type="java.lang.Integer">
-            <column name="_224P" />
-        </property>
-        <property name="$224o" type="java.lang.Integer">
-            <column name="_224O" />
-        </property>
-        <property name="$225p" type="java.lang.Integer">
-            <column name="_225P" />
-        </property>
-        <property name="$225o" type="java.lang.Integer">
-            <column name="_225O" />
-        </property>
-        <property name="$226p" type="java.lang.Integer">
-            <column name="_226P" />
-        </property>
-        <property name="$226o" type="java.lang.Integer">
-            <column name="_226O" />
-        </property>
-        <property name="$227p" type="java.lang.Integer">
-            <column name="_227P" />
-        </property>
-        <property name="$227o" type="java.lang.Integer">
-            <column name="_227O" />
-        </property>
-        <property name="$228p" type="java.lang.Integer">
-            <column name="_228P" />
-        </property>
-        <property name="$228o" type="java.lang.Integer">
-            <column name="_228O" />
-        </property>
-        <property name="$230p" type="java.lang.Integer">
-            <column name="_230P" />
-        </property>
-        <property name="$230o" type="java.lang.Integer">
-            <column name="_230O" />
-        </property>
-        <property name="$300" type="java.lang.Integer">
-            <column name="_300" />
-        </property>
-        <property name="vetoIneligible" type="java.lang.Integer">
-            <column name="VetoIneligible" />
-        </property>
-        <property name="vetoed" type="java.lang.Integer">
-            <column name="Vetoed" />
-        </property>
-        <property name="lineItemVeto" type="java.lang.Integer">
-            <column name="LineItemVeto" />
-        </property>
-        <property name="vetoOverriden" type="java.lang.Integer">
-            <column name="VetoOverriden" />
-        </property>
-        <property name="lawNoGovSig" type="java.lang.Integer">
-            <column name="LawNoGovSig" />
-        </property>
-        <property name="recalledByLeg" type="java.lang.Integer">
-            <column name="RecalledByLeg" />
-        </property>
-        <property name="houseLastAction" type="java.lang.Integer">
-            <column name="House_Last_Action" />
-        </property>
-        <property name="senateLastAction" type="java.lang.Integer">
-            <column name="Senate_Last_Action" />
-        </property>
-        <property name="petition" type="java.lang.Integer">
-            <column name="Petition" />
-        </property>
-        <property name="dateReferred" type="java.util.Date">
-            <column name="Date_Referred" />
-        </property>
-        <property name="dayReferred" type="java.lang.Integer">
-            <column name="Day_Referred" />
-        </property>
-        <property name="monthReferred" type="java.lang.Integer">
-            <column name="Month_Referred" />
-        </property>
-        <property name="yearReferred" type="java.lang.Integer">
-            <column name="Year_Referred" />
-        </property>
-        <property name="signedbyGov" type="java.lang.Integer">
-            <column name="SignedbyGov" />
-        </property>
-    </class>
+  <class catalog="PAPolicy_Copy" name="edu.temple.cla.policydb.billshibernatedao.Bill" table="Bills_Data">
+    <id name="id" type="string">
+      <column length="11" name="ID"/>
+      <generator class="assigned"/>
+    </id>
+    <property name="chamber" type="java.lang.Short">
+      <column name="Chamber"/>
+    </property>
+    <property name="session" type="string">
+      <column length="10" name="Session"/>
+    </property>
+    <property name="bill" type="string">
+      <column length="50" name="Bill"/>
+    </property>
+    <property name="subtype" type="string">
+      <column length="2" name="SubType"/>
+    </property>
+    <property name="hyperlink" type="string">
+      <column length="65535" name="Hyperlink"/>
+    </property>
+    <property name="sponsor" type="string">
+      <column name="Sponsor"/>
+    </property>
+    <property name="sponsorParty" type="java.lang.Short">
+      <column name="Sponsor_Party"/>
+    </property>
+    <property name="sponsorCounty" type="string">
+      <column length="50" name="Sponsor_County"/>
+    </property>
+    <property name="sponsorTerms" type="string">
+      <column length="50" name="Sponsor_Terms"/>
+    </property>
+    <property name="abstract_" type="string">
+      <column length="65535" name="Abstract"/>
+    </property>
+    <property name="tax" type="java.lang.Integer">
+      <column name="Tax"/>
+    </property>
+    <property name="eld" type="java.lang.Integer">
+      <column name="Eld"/>
+    </property>
+    <property name="conAmmend" type="java.lang.Short">
+      <column name="Con_Ammend"/>
+    </property>
+    <property name="actNo" type="string">
+      <column length="4" name="Act_No"/>
+    </property>
+    <property name="dateEnacted" type="java.util.Date">
+      <column name="Date_Enacted"/>
+    </property>
+    <property name="dayEnacted" type="java.lang.Short">
+      <column name="Day_Enacted"/>
+    </property>
+    <property name="monthEnacted" type="java.lang.Short">
+      <column name="Month_Enacted"/>
+    </property>
+    <property name="yearEnacted" type="java.lang.Short">
+      <column name="Year_Enacted"/>
+    </property>
+    <property name="code" type="java.lang.Integer">
+      <column name="Code"/>
+    </property>
+    <property name="commemorative" type="java.lang.Integer">
+      <column name="Commemorative"/>
+    </property>
+    <property name="appropriations" type="java.lang.Integer">
+      <column name="Appropriations"/>
+    </property>
+    <property name="$101p" type="java.lang.Integer">
+      <column name="_101P"/>
+    </property>
+    <property name="$101o" type="java.lang.Integer">
+      <column name="_101O"/>
+    </property>
+    <property name="$102p" type="java.lang.Integer">
+      <column name="_102P"/>
+    </property>
+    <property name="$102o" type="java.lang.Integer">
+      <column name="_102O"/>
+    </property>
+    <property name="$103p" type="java.lang.Integer">
+      <column name="_103P"/>
+    </property>
+    <property name="$103o" type="java.lang.Integer">
+      <column name="_103O"/>
+    </property>
+    <property name="$104p" type="java.lang.Integer">
+      <column name="_104P"/>
+    </property>
+    <property name="$104o" type="java.lang.Integer">
+      <column name="_104O"/>
+    </property>
+    <property name="$105p" type="java.lang.Integer">
+      <column name="_105P"/>
+    </property>
+    <property name="$105o" type="java.lang.Integer">
+      <column name="_105O"/>
+    </property>
+    <property name="$106p" type="java.lang.Integer">
+      <column name="_106P"/>
+    </property>
+    <property name="$106o" type="java.lang.Integer">
+      <column name="_106O"/>
+    </property>
+    <property name="$107p" type="java.lang.Integer">
+      <column name="_107P"/>
+    </property>
+    <property name="$107o" type="java.lang.Integer">
+      <column name="_107O"/>
+    </property>
+    <property name="$108p" type="java.lang.Integer">
+      <column name="_108P"/>
+    </property>
+    <property name="$108o" type="java.lang.Integer">
+      <column name="_108O"/>
+    </property>
+    <property name="$109p" type="java.lang.Integer">
+      <column name="_109P"/>
+    </property>
+    <property name="$109o" type="java.lang.Integer">
+      <column name="_109O"/>
+    </property>
+    <property name="$110p" type="java.lang.Integer">
+      <column name="_110P"/>
+    </property>
+    <property name="$110o" type="java.lang.Integer">
+      <column name="_110O"/>
+    </property>
+    <property name="$111p" type="java.lang.Integer">
+      <column name="_111P"/>
+    </property>
+    <property name="$111o" type="java.lang.Integer">
+      <column name="_111O"/>
+    </property>
+    <property name="$112p" type="java.lang.Integer">
+      <column name="_112P"/>
+    </property>
+    <property name="$112o" type="java.lang.Integer">
+      <column name="_112O"/>
+    </property>
+    <property name="$113p" type="java.lang.Integer">
+      <column name="_113P"/>
+    </property>
+    <property name="$113o" type="java.lang.Integer">
+      <column name="_113O"/>
+    </property>
+    <property name="$114p" type="java.lang.Integer">
+      <column name="_114P"/>
+    </property>
+    <property name="$114o" type="java.lang.Integer">
+      <column name="_114O"/>
+    </property>
+    <property name="$115p" type="java.lang.Integer">
+      <column name="_115P"/>
+    </property>
+    <property name="$115o" type="java.lang.Integer">
+      <column name="_115O"/>
+    </property>
+    <property name="$116p" type="java.lang.Integer">
+      <column name="_116P"/>
+    </property>
+    <property name="$116o" type="java.lang.Integer">
+      <column name="_116O"/>
+    </property>
+    <property name="$117p" type="java.lang.Integer">
+      <column name="_117P"/>
+    </property>
+    <property name="$117o" type="java.lang.Integer">
+      <column name="_117O"/>
+    </property>
+    <property name="$118p" type="java.lang.Integer">
+      <column name="_118P"/>
+    </property>
+    <property name="$118o" type="java.lang.Integer">
+      <column name="_118O"/>
+    </property>
+    <property name="$119p" type="java.lang.Integer">
+      <column name="_119P"/>
+    </property>
+    <property name="$119o" type="java.lang.Integer">
+      <column name="_119O"/>
+    </property>
+    <property name="$120p" type="java.lang.Integer">
+      <column name="_120P"/>
+    </property>
+    <property name="$120o" type="java.lang.Integer">
+      <column name="_120O"/>
+    </property>
+    <property name="$121p" type="java.lang.Integer">
+      <column name="_121P"/>
+    </property>
+    <property name="$121o" type="java.lang.Integer">
+      <column name="_121O"/>
+    </property>
+    <property name="$122p" type="java.lang.Integer">
+      <column name="_122P"/>
+    </property>
+    <property name="$122o" type="java.lang.Integer">
+      <column name="_122O"/>
+    </property>
+    <property name="$123p" type="java.lang.Integer">
+      <column name="_123P"/>
+    </property>
+    <property name="$123o" type="java.lang.Integer">
+      <column name="_123O"/>
+    </property>
+    <property name="$124p" type="java.lang.Integer">
+      <column name="_124P"/>
+    </property>
+    <property name="$124o" type="java.lang.Integer">
+      <column name="_124O"/>
+    </property>
+    <property name="$125p" type="java.lang.Integer">
+      <column name="_125P"/>
+    </property>
+    <property name="$125o" type="java.lang.Integer">
+      <column name="_125O"/>
+    </property>
+    <property name="$126p" type="java.lang.Integer">
+      <column name="_126P"/>
+    </property>
+    <property name="$126o" type="java.lang.Integer">
+      <column name="_126O"/>
+    </property>
+    <property name="$127p" type="java.lang.Integer">
+      <column name="_127P"/>
+    </property>
+    <property name="$127o" type="java.lang.Integer">
+      <column name="_127O"/>
+    </property>
+    <property name="$130p" type="java.lang.Integer">
+      <column name="_130P"/>
+    </property>
+    <property name="$130o" type="java.lang.Integer">
+      <column name="_130O"/>
+    </property>
+    <property name="$201p" type="java.lang.Integer">
+      <column name="_201P"/>
+    </property>
+    <property name="$201o" type="java.lang.Integer">
+      <column name="_201O"/>
+    </property>
+    <property name="$202p" type="java.lang.Integer">
+      <column name="_202P"/>
+    </property>
+    <property name="$202o" type="java.lang.Integer">
+      <column name="_202O"/>
+    </property>
+    <property name="$203p" type="java.lang.Integer">
+      <column name="_203P"/>
+    </property>
+    <property name="$203o" type="java.lang.Integer">
+      <column name="_203O"/>
+    </property>
+    <property name="$205p" type="java.lang.Integer">
+      <column name="_205P"/>
+    </property>
+    <property name="$205o" type="java.lang.Integer">
+      <column name="_205O"/>
+    </property>
+    <property name="$207p" type="java.lang.Integer">
+      <column name="_207P"/>
+    </property>
+    <property name="$207o" type="java.lang.Integer">
+      <column name="_207O"/>
+    </property>
+    <property name="$208p" type="java.lang.Integer">
+      <column name="_208P"/>
+    </property>
+    <property name="$208o" type="java.lang.Integer">
+      <column name="_208O"/>
+    </property>
+    <property name="$209p" type="java.lang.Integer">
+      <column name="_209P"/>
+    </property>
+    <property name="$209o" type="java.lang.Integer">
+      <column name="_209O"/>
+    </property>
+    <property name="$210p" type="java.lang.Integer">
+      <column name="_210P"/>
+    </property>
+    <property name="$210o" type="java.lang.Integer">
+      <column name="_210O"/>
+    </property>
+    <property name="$211p" type="java.lang.Integer">
+      <column name="_211P"/>
+    </property>
+    <property name="$211o" type="java.lang.Integer">
+      <column name="_211O"/>
+    </property>
+    <property name="$212p" type="java.lang.Integer">
+      <column name="_212P"/>
+    </property>
+    <property name="$212o" type="java.lang.Integer">
+      <column name="_212O"/>
+    </property>
+    <property name="$213p" type="java.lang.Integer">
+      <column name="_213P"/>
+    </property>
+    <property name="$213o" type="java.lang.Integer">
+      <column name="_213O"/>
+    </property>
+    <property name="$214p" type="java.lang.Integer">
+      <column name="_214P"/>
+    </property>
+    <property name="$214o" type="java.lang.Integer">
+      <column name="_214O"/>
+    </property>
+    <property name="$215p" type="java.lang.Integer">
+      <column name="_215P"/>
+    </property>
+    <property name="$215o" type="java.lang.Integer">
+      <column name="_215O"/>
+    </property>
+    <property name="$216p" type="java.lang.Integer">
+      <column name="_216P"/>
+    </property>
+    <property name="$216o" type="java.lang.Integer">
+      <column name="_216O"/>
+    </property>
+    <property name="$217p" type="java.lang.Integer">
+      <column name="_217P"/>
+    </property>
+    <property name="$217o" type="java.lang.Integer">
+      <column name="_217O"/>
+    </property>
+    <property name="$219p" type="java.lang.Integer">
+      <column name="_219P"/>
+    </property>
+    <property name="$219o" type="java.lang.Integer">
+      <column name="_219O"/>
+    </property>
+    <property name="$221p" type="java.lang.Integer">
+      <column name="_221P"/>
+    </property>
+    <property name="$221o" type="java.lang.Integer">
+      <column name="_221O"/>
+    </property>
+    <property name="$222p" type="java.lang.Integer">
+      <column name="_222P"/>
+    </property>
+    <property name="$222o" type="java.lang.Integer">
+      <column name="_222O"/>
+    </property>
+    <property name="$224p" type="java.lang.Integer">
+      <column name="_224P"/>
+    </property>
+    <property name="$224o" type="java.lang.Integer">
+      <column name="_224O"/>
+    </property>
+    <property name="$225p" type="java.lang.Integer">
+      <column name="_225P"/>
+    </property>
+    <property name="$225o" type="java.lang.Integer">
+      <column name="_225O"/>
+    </property>
+    <property name="$226p" type="java.lang.Integer">
+      <column name="_226P"/>
+    </property>
+    <property name="$226o" type="java.lang.Integer">
+      <column name="_226O"/>
+    </property>
+    <property name="$227p" type="java.lang.Integer">
+      <column name="_227P"/>
+    </property>
+    <property name="$227o" type="java.lang.Integer">
+      <column name="_227O"/>
+    </property>
+    <property name="$228p" type="java.lang.Integer">
+      <column name="_228P"/>
+    </property>
+    <property name="$228o" type="java.lang.Integer">
+      <column name="_228O"/>
+    </property>
+    <property name="$230p" type="java.lang.Integer">
+      <column name="_230P"/>
+    </property>
+    <property name="$230o" type="java.lang.Integer">
+      <column name="_230O"/>
+    </property>
+    <property name="$300" type="java.lang.Integer">
+      <column name="_300"/>
+    </property>
+    <property name="vetoIneligible" type="java.lang.Integer">
+      <column name="VetoIneligible"/>
+    </property>
+    <property name="vetoed" type="java.lang.Integer">
+      <column name="Vetoed"/>
+    </property>
+    <property name="lineItemVeto" type="java.lang.Integer">
+      <column name="LineItemVeto"/>
+    </property>
+    <property name="vetoOverriden" type="java.lang.Integer">
+      <column name="VetoOverriden"/>
+    </property>
+    <property name="lawNoGovSig" type="java.lang.Integer">
+      <column name="LawNoGovSig"/>
+    </property>
+    <property name="recalledByLeg" type="java.lang.Integer">
+      <column name="RecalledByLeg"/>
+    </property>
+    <property name="houseLastAction" type="java.lang.Integer">
+      <column name="House_Last_Action"/>
+    </property>
+    <property name="senateLastAction" type="java.lang.Integer">
+      <column name="Senate_Last_Action"/>
+    </property>
+    <property name="petition" type="java.lang.Integer">
+      <column name="Petition"/>
+    </property>
+    <property name="dateReferred" type="java.util.Date">
+      <column name="Date_Referred"/>
+    </property>
+    <property name="dayReferred" type="java.lang.Integer">
+      <column name="Day_Referred"/>
+    </property>
+    <property name="monthReferred" type="java.lang.Integer">
+      <column name="Month_Referred"/>
+    </property>
+    <property name="yearReferred" type="java.lang.Integer">
+      <column name="Year_Referred"/>
+    </property>
+    <property name="signedbyGov" type="java.lang.Integer">
+      <column name="SignedbyGov"/>
+    </property>
+  </class>
 </hibernate-mapping>

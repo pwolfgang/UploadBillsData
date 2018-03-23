@@ -32,13 +32,13 @@
 package edu.temple.cla.policydb.uploadbillsdata;
 
 import edu.temple.cla.policydb.billdata.Action;
-import edu.temple.cla.policydb.billdata.Bill;
+import edu.temple.cla.policydb.billdata.BillData;
 import edu.temple.cla.policydb.billdata.ChamberState;
 import edu.temple.cla.policydb.billdata.ConstitutionAmmendmentState;
 import edu.temple.cla.policydb.billdata.GovernorState;
 import edu.temple.cla.policydb.billdata.Sponsor;
-import edu.temple.cla.policydb.billshibernatedao.BillsData;
-import edu.temple.cla.policydb.billshibernatedao.BillsDataDAO;
+import edu.temple.cla.policydb.billshibernatedao.Bill;
+import edu.temple.cla.policydb.billshibernatedao.BillDAO;
 import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,6 +49,7 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +73,7 @@ import org.xml.sax.SAXException;
 public class UploadBillsData {
 
     private static final Logger LOGGER = Logger.getLogger(UploadBillsData.class);
-    private static BillsDataDAO billsDataDAO;
+    private static BillDAO billDAO;
     private static CommitteeCodes committeeCodes;
     private static final Set<Committee> UNKNOWN_COMMITTEES = new TreeSet<>();
     private static final String PALEG = "www.legis.state.pa.us";
@@ -107,12 +108,12 @@ public class UploadBillsData {
         if (args[1] == null) {
             System.err.println("args[1] must be non null");
         }
-        billsDataDAO = new BillsDataDAO(args[1]);
-        committeeCodes = new CommitteeCodes(billsDataDAO.getSessionFactory());
+        billDAO = new BillDAO(args[1]);
+        committeeCodes = new CommitteeCodes(billDAO.getSessionFactory());
         File directory = new File(args[0]);
         processDirectory(directory);
         System.err.println("Done processing directory");
-        billsDataDAO.closeSessionFactory();
+        billDAO.closeSessionFactory();
         PrintWriter pw3 = null;
         try {
             pw3 = new PrintWriter("UnknownCommitees.txt");
@@ -132,9 +133,9 @@ public class UploadBillsData {
 
     /**
      * Method to recursively scan directories. If a file is found, it is passed
- to processEntry, otherwise the directory is recursively scanned.
+     * to processEntry, otherwise the directory is recursively scanned.
      *
-     * @param parent The directory to scan
+     * @param file The directory to scan
      * @throws Exception
      */
     private static void processDirectory(File file) {
@@ -164,14 +165,14 @@ public class UploadBillsData {
 
     /**
      * A method to process a file. Each entry is assumed to contain an XML
-     * representation of a session as provided by the legislative data
-     * processing service. Each bill is converted a BillsData object and
-     * stored into the database.
+ representation of a session as provided by the legislative data
+ processing service. Each billData is converted a Bill object and
+ stored into the database.
      *
      * @param in The input stream containing the entry.
      */
     private static void processEntry(InputStream in) {
-        billsDataDAO.openSession();
+        billDAO.openSession();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -183,10 +184,15 @@ public class UploadBillsData {
             LOGGER.error("Error processing entry", x);
             System.exit(1);
         } finally {
-            billsDataDAO.closeSession();
+            billDAO.closeSession();
         }
     }
 
+    /**
+     * Process a node in the XML Dom.
+     * If this node is a billData element, it is passed to processBill.
+     * @param node 
+     */
     private static void processNode(Node node) {
         if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("bill")) {
             processBill(node);
@@ -198,88 +204,87 @@ public class UploadBillsData {
     }
 
     /**
-     * Method to insert a bill into the database.
+     * Method to insert a billData into the database.
      *
-     * @param node The bill node in the XML DOM tree
+     * @param node The billData node in the XML DOM tree
      */
     private static void processBill(Node node) {
-        Bill bill = Bill.getBillFromNode(node);
-        billsDataDAO.beginTransaction();
-        BillsData billsData = billsDataDAO.getBill(bill.getBillID());
-        String session = bill.getSession();
-        int year = bill.getSessionYear();
-        int specialSessionNo = bill.getSessionSequence();
-        int billNo = bill.getBillNo();
-        String chamber = bill.getChamber();
-        String type = bill.getType();
-        String title = bill.getTitle();
+        BillData billData = BillData.getBillFromNode(node);
+        billDAO.beginTransaction();
+        Bill bill = billDAO.getBill(billData.getBillID());
+        String session = billData.getSession();
+        int year = billData.getSessionYear();
+        int specialSessionNo = billData.getSessionSequence();
+        int billNo = billData.getBillNo();
+        String chamber = billData.getChamber();
+        String type = billData.getType();
+        String title = billData.getTitle();
         String billString = String.format("%s%s %d", chamber, type, billNo);
-        String billId = String.format("%04d%d%s%s%04d", year, specialSessionNo, chamber, type, billNo);
         short chamberNo;
         if (chamber.equals("H")) {
             chamberNo = 1;
         } else {
             chamberNo = 2;
         }
-        billsData.setChamber(chamberNo);
-        billsData.setSession(session);
-        billsData.setBill(billString);
+        bill.setChamber(chamberNo);
+        bill.setSession(session);
+        bill.setBill(billString);
         String resource = String.format(ROOT, year,
                 specialSessionNo, chamber, type, billNo);
-        billsData.setHyperlink("#http://" + PALEG + resource + "#");
-        Sponsor[] sponsors = bill.getSponsors();
+        bill.setHyperlink("#http://" + PALEG + resource + "#");
+        Sponsor[] sponsors = billData.getSponsors();
         if (sponsors.length > 0) {
             Sponsor sponsor = sponsors[0];
-            billsData.setSponsor(sponsor.getName());
+            bill.setSponsor(sponsor.getName());
             String partyString = sponsor.getParty();
             short party = 0;
             if ("D".equals(partyString)) {
                 party = 1;
             }
-            billsData.setSponsorParty(party);
-            billsData.setSponsorCounty(sponsor.getDistrictNumber());
+            bill.setSponsorParty(party);
+            bill.setSponsorCounty(sponsor.getDistrictNumber());
         }
-        billsData.setAbstract_(title);
-        Date dateReferred = findDateReferred(bill);
+        bill.setAbstract_(title);
+        Date dateReferred = findDateReferred(billData);
         if (dateReferred != null) {
             Calendar c = Calendar.getInstance();
             c.setTime(dateReferred);
-            billsData.setDateReferred(dateReferred);
-            billsData.setDayReferred(c.get(Calendar.DAY_OF_MONTH));
-            billsData.setMonthReferred(c.get(Calendar.MONTH) + 1);
-            billsData.setYearReferred(c.get(Calendar.YEAR));
+            bill.setDateReferred(dateReferred);
+            bill.setDayReferred(c.get(Calendar.DAY_OF_MONTH));
+            bill.setMonthReferred(c.get(Calendar.MONTH) + 1);
+            bill.setYearReferred(c.get(Calendar.YEAR));
         }
-        if (bill.getType().equals("B")) {
-            Action actNo = findActNo(bill);
+        if (billData.getType().equals("B")) {
+            Action actNo = findActNo(billData);
             if (actNo != null) {
                 String actionTaken = actNo.getActionTaken();
                 int lastSpace = actionTaken.lastIndexOf(" ");
-                billsData.setActNo(actionTaken.substring(lastSpace + 1));
+                bill.setActNo(actionTaken.substring(lastSpace + 1));
                 Date dateEnacted = actNo.getTheDate();
                 if (dateEnacted != null) {
                     Calendar c = Calendar.getInstance();
                     c.setTime(dateEnacted);
-                    billsData.setDateEnacted(dateEnacted);
-                    billsData.setDayEnacted((short) c.get(Calendar.DATE));
-                    billsData.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
-                    billsData.setYearEnacted((short) c.get(Calendar.YEAR));
+                    bill.setDateEnacted(dateEnacted);
+                    bill.setDayEnacted((short) c.get(Calendar.DATE));
+                    bill.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
+                    bill.setYearEnacted((short) c.get(Calendar.YEAR));
                 }
             }
         } else {
-            Date dateAdopted = getDateAdopted(bill);
+            Date dateAdopted = getDateAdopted(billData);
             if (dateAdopted != null) {
                 Calendar c = Calendar.getInstance();
                 c.setTime(dateAdopted);
-                billsData.setDateEnacted(dateAdopted);
-                billsData.setDayEnacted((short) c.get(Calendar.DATE));
-                billsData.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
-                billsData.setYearEnacted((short) c.get(Calendar.YEAR));
+                bill.setDateEnacted(dateAdopted);
+                bill.setDayEnacted((short) c.get(Calendar.DATE));
+                bill.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
+                bill.setYearEnacted((short) c.get(Calendar.YEAR));
             }
         }
-        processHistory(bill, billsData);
-        setCommittees(bill, billsData);
-        billsDataDAO.save(billsData);
-        billsDataDAO.endTransaction();
+        processHistory(billData, bill);
+        setCommittees(billData, bill);
+        billDAO.save(bill);
+        billDAO.endTransaction();
     }
 
     /**
@@ -287,10 +292,10 @@ public class UploadBillsData {
      * was first referred to a committee, but for Resolutions it may be the date
      * the resolution was introduced.
      *
-     * @param bill The bill
+     * @param bill The billData
      * @returns the date the bill was first referred to a committee.
      */
-    private static Date findDateReferred(Bill bill) {
+    private static Date findDateReferred(BillData bill) {
         Action[] history = bill.getHistory();
         for (Action action : history) {
             if (action.getTheDate() != null) {
@@ -301,13 +306,13 @@ public class UploadBillsData {
     }
 
     /**
-     * Method to find the Act No. and date the bill was enacted.
+     * Method to find the Act No. and date the billData was enacted.
      *
-     * @param bill The bill
+     * @param bill The billData
      * @return A modified Action that contains the Act No. and the date of the
      * action that preceeded the Act No. action in the history.
      */
-    private static Action findActNo(Bill bill) {
+    private static Action findActNo(BillData bill) {
         Action[] history = bill.getHistory();
         for (int i = 0; i < history.length; i++) {
             Action action = history[i];
@@ -332,7 +337,7 @@ public class UploadBillsData {
      * @param bill The resolution
      * @return The data the resolution was adopted, if any
      */
-    private static Date getDateAdopted(Bill bill) {
+    private static Date getDateAdopted(BillData bill) {
         Action[] history = bill.getHistory();
         Date dateAdoptedByHouse = null;
         Date dateAdoptedBySenate = null;
@@ -370,7 +375,7 @@ public class UploadBillsData {
         }
     }
 
-    private static void processHistory(Bill bill, BillsData billsData) {
+    private static void processHistory(BillData bill, Bill billsData) {
 
         ChamberState houseState = new ChamberState("H", bill.getType(), bill.getBillID());
         ChamberState senateState = new ChamberState("S", bill.getType(), bill.getBillID());
@@ -403,13 +408,18 @@ public class UploadBillsData {
 
     }
 
-    private static void setCommittees(Bill bill, BillsData billsData) {
+    /**
+     * Method to set the committee fields.
+     * @param billData The BillData object from the XML data.
+     * @param bill The database Bill object to be updated.
+     */
+    private static void setCommittees(BillData billData, Bill bill) {
         boolean inHouse;
-        Action[] actions = bill.getHistory();
+        Action[] actions = billData.getHistory();
         boolean primarySenateCommitteeFound = false;
         boolean primaryHouseCommitteeFound = false;
         boolean conferenceCommitteeFound = false;
-        billsDataDAO.clearAll(billsData);
+        billDAO.clearAll(bill);
         for (Action a : actions) {
             String verb = a.getVerb();
             inHouse = a.getActionChamber().equals("H");
@@ -427,7 +437,7 @@ public class UploadBillsData {
                 if (ctyCode == null) {
                     UNKNOWN_COMMITTEES.add(committee);
                     System.err.println("Unknown committee " + committee);
-                    System.err.println(billsData.getSession() + " " + billsData.getBill());
+                    System.err.println(bill.getSession() + " " + bill.getBill());
                     System.err.println(a.getActionTaken());
                 }
                 boolean primary = false;
@@ -441,12 +451,12 @@ public class UploadBillsData {
                 }
                 try {
                     if (ctyCode != null) {
-                        billsDataDAO.setCommittee(billsData, ctyCode, primary, 1);
+                        billDAO.setCommittee(bill, ctyCode, primary, 1);
                     }
                 } catch (Throwable t) {
                     String message = "Error processing "
-                        + billsData.getSession() 
-                        + " " + billsData.getBill() 
+                        + bill.getSession() 
+                        + " " + bill.getBill() 
                         + " ctyCode: " + ctyCode 
                         + " primary: " + primary;
                     LOGGER.error(message, t);
@@ -456,41 +466,32 @@ public class UploadBillsData {
         }
 
         if (conferenceCommitteeFound) {
-            billsDataDAO.setCommittee(billsData, 300, false, 1);
+            billDAO.setCommittee(bill, 300, false, 1);
         }
 
     }
 
+    /**
+     * Method to convert a string to title case.
+     * The input string is split into words and the first character of each
+     * work is set to uppercase. The words and and on are not converted.
+     * @param s String to be converted.
+     * @return String converted to title case.
+     */
     private static String toTitleCase(String s) {
         String[] words = s.trim().split("\\s+");
-        StringBuilder stb = new StringBuilder();
-
-        boolean first = true;
+        StringJoiner sj = new StringJoiner(" ");
 
         for (String word : words) {
-            if (first) {
-                first = false;
-
-            } else {
-                stb.append(" ");
-
-            }
             word = word.toLowerCase();
-
-            try {
                 if (!"and".equals(word) && !"on".equals(word) && !word.isEmpty()) {
-                    char firstLetter = word.charAt(0);
-                    firstLetter = Character.toUpperCase(firstLetter);
-                    word = firstLetter + word.substring(1);
-
+                    char[] chars = word.toCharArray();
+                    chars[0] = Character.toUpperCase(chars[0]);
+                    word = new String(chars);
                 }
-            } catch (Exception ex) {
-                LOGGER.error("Error processing '" + word + "' from " + s, ex);
-                System.exit(1);
-            }
-            stb.append(word);
+            sj.add(word);
         }
-        return stb.toString();
+        return sj.toString();
     }
     
 

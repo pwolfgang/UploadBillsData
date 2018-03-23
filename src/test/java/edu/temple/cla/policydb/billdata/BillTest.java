@@ -5,7 +5,7 @@
 
 package edu.temple.cla.policydb.billdata;
 
-import edu.temple.cla.policydb.billdata.Bill;
+import edu.temple.cla.policydb.billdata.BillData;
 import edu.templecla.policydb.myxmltest.TestElementFactory;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -70,7 +70,7 @@ public class BillTest {
 "                </action>\n" +
 "             </actionHistory>\n" +
 "         </bill>");
-        Bill result = Bill.getBillFromNode(billElement);
+        BillData result = BillData.getBillFromNode(billElement);
         assertEquals("1969-70", result.getSession());
         assertEquals(new Integer(1969), result.getSessionYear());
         assertEquals(new Integer(0), result.getSessionSequence());

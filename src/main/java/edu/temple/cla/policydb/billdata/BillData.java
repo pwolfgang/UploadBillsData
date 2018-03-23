@@ -1,4 +1,4 @@
-// Class to represent a Bill or Resolution
+// Class to represent a BillData or Resolution
 //
 // (C) 2009 Paul Wolfgang
 //
@@ -23,12 +23,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * Class to represent a Bill. Also includes methods read the XML representation
+ * Class to represent a BillData. Also includes methods read the XML representation
  * as provided by the PA Legislature Data Processing Department.
  *
  * @author Paul Wolfgang
  */
-public class Bill implements Comparable<Bill> {
+public class BillData implements Comparable<BillData> {
 
     /**
      * The ID assigned by the legislative DP department Format yyyynctmmmm where
@@ -87,28 +87,28 @@ public class Bill implements Comparable<Bill> {
     /**
      * Construction of empty bills prohibited
      */
-    private Bill() {
+    private BillData() {
     }
 
     /**
-     * Method to generate a Bill from an Node
+     * Method to generate a BillData from an Node
      *
      * @param node The node being processed
-     * @return A Bill object corresponding to the XML element
+     * @return A BillData object corresponding to the XML element
      */
-    public static Bill getBillFromNode(Node node) {
-        Bill bill = new Bill();
+    public static BillData getBillFromNode(Node node) {
+        BillData bill = new BillData();
         processNode(node, bill);
         return bill;
     }
 
     /**
-     * Method to process an XML DOM Node from a Bill file
+     * Method to process an XML DOM Node from a BillData file
      *
      * @param node The node being processed
-     * @param bill The Bill object which is being constructed
+     * @param bill The BillData object which is being constructed
      */
-    public static void processNode(Node node, Bill bill) {
+    public static void processNode(Node node, BillData bill) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             String nodeName = node.getNodeName();
             switch (nodeName) {
@@ -314,7 +314,7 @@ public class Bill implements Comparable<Bill> {
     }
 
     @Override
-    public int compareTo(Bill otherBill) {
+    public int compareTo(BillData otherBill) {
         return getBillID().compareTo(otherBill.getBillID());
     }
 
@@ -327,7 +327,7 @@ public class Bill implements Comparable<Bill> {
             return false;
         }
         if (this.getClass() == other.getClass()) {
-            Bill otherBill = (Bill) other;
+            BillData otherBill = (BillData) other;
             return compareTo(otherBill) == 0;
         } else {
             return false;
