@@ -31,24 +31,18 @@
  */
 package edu.temple.cla.policydb.billshibernatedao;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
+import edu.temple.cla.policydb.uploadbillsdata.UploadBillsData;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.model.naming.Identifier;
-import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
-import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 
 /**
- * This class is a Hibernate Data Access Object for the Bill.
+ * This class is a Hibernate Data Access Object for a Bill.
  *
  * @author Paul Wolfgang
  */
@@ -100,40 +94,7 @@ public class BillDAO {
      * @param tableName The table to store the Bills_Data 
      */
     public BillDAO(String tableName) {
-        Configuration configuration;
-        try {
-            configuration = new Configuration()
-                    .configure("hibernate.cfg.xml");
-            PhysicalNamingStrategy myStrategy = 
-                    new MyPhysicalNamingStrategy(PhysicalNamingStrategyStandardImpl.INSTANCE, tableName);
-            configuration.setPhysicalNamingStrategy(myStrategy);
-            sessionFactory = configuration.buildSessionFactory();
-        } catch (HibernateException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
-    
-    @SuppressWarnings("serial")
-    private class MyPhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
-        private final PhysicalNamingStrategy parent;
-        private final String newBillsTableName;
-        
-        public MyPhysicalNamingStrategy(PhysicalNamingStrategy parent, String newBillsTableName) {
-            super();
-            this.parent = parent;
-            this.newBillsTableName = newBillsTableName;
-        }
-        
-        @Override
-        public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
-            if (name.getText().equals("Bills_Data")) {
-                return new Identifier(newBillsTableName, false);
-            } else {
-                return name;
-            }
-        }
-        
-        
+        sessionFactory = UploadBillsData.createSessionFactory(tableName);
     }
     
     /**
@@ -145,14 +106,14 @@ public class BillDAO {
     }
 
     /**
-     * Method to set one of the endTransactiontee fields in a billData object
+     * Method to set one of the committee fields in a bill object
      *
-     * @param billData The Bill object
+     * @param bill The Bill object
      * @param ctyCode The endTransactiontee code
      * @param isPrimary True from primary endTransactiontee, false for other endTransactiontees
      * @param value The value to be set
      */
-    public void setCommittee(Bill billData, int ctyCode, boolean isPrimary, Integer value) {
+    public void setCommittee(Bill bill, int ctyCode, boolean isPrimary, Integer value) {
         String methodName;
         if (ctyCode != 300) {
             methodName = String.format("set$%3d%s", ctyCode, isPrimary ? "p" : "o");
@@ -161,25 +122,25 @@ public class BillDAO {
         }
         try {
             Method method = Bill.class.getMethod(methodName, Integer.class);
-            method.invoke(billData, value);
+            method.invoke(bill, value);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             String message = String.format("Error setting committee %d%s in bill %s",
-                    ctyCode, isPrimary ? "p" : "o", billData.getId());
+                    ctyCode, isPrimary ? "p" : "o", bill.getId());
             LOGGER.error(message, ex);
         }
     }
 
     /**
-     * Method to clear all endTransactiontee fields in a Bill object
+     * Method to clear all committee fields in a Bill object
      *
-     * @param billData The Bill object
+     * @param bill The Bill object
      */
-    public void clearAll(Bill billData) {
+    public void clearAll(Bill bill) {
         for (int ctyCode : ctyCodes) {
-            setCommittee(billData, ctyCode, true, 0);
-            setCommittee(billData, ctyCode, false, 0);
+            setCommittee(bill, ctyCode, true, 0);
+            setCommittee(bill, ctyCode, false, 0);
         }
-        setCommittee(billData, 300, false, 0);
+        setCommittee(bill, 300, false, 0);
     }
 
     /**
@@ -192,35 +153,26 @@ public class BillDAO {
      */
     public Bill getBill(String billID) {
         beginTransaction();
-        Bill billsData = null;
+        Bill bill = null;
         try {
-            billsData = session.get(Bill.class, billID);
-            if (billsData == null) {
-                billsData = new Bill();
-                billsData.setId(billID);
-                session.save(billsData);
+            bill = session.get(Bill.class, billID);
+            if (bill == null) {
+                bill = new Bill();
+                bill.setId(billID);
+                session.save(bill);
             }
         } catch (HibernateException ex) {
-            if (ex instanceof JDBCException) {
-                JDBCException jdbcEx = (JDBCException) ex;
-                Throwable cause = jdbcEx.getCause();
-                if (cause instanceof MySQLSyntaxErrorException) {
-                    
-                }
-                String sql = jdbcEx.getSQL();
-                LOGGER.error(sql);
-            }
             LOGGER.error("Error retrieving " + billID, ex);
         }
-        return billsData;
+        return bill;
     }
     
     /**
      * Method to save a Bill object back to the database
-     * @param billsData the bills data to be saved to the db
+     * @param bill the bills data to be saved to the db
      */
-    public void save(Bill billsData) {
-        session.save(billsData);
+    public void save(Bill bill) {
+        session.save(bill);
     }
 
     /**

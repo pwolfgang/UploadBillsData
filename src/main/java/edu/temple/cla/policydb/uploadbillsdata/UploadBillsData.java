@@ -59,6 +59,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -493,6 +500,39 @@ public class UploadBillsData {
         }
         return sj.toString();
     }
-    
 
+    public static final SessionFactory createSessionFactory(String tableName) {
+        Configuration configuration;
+        try {
+            configuration = new Configuration().configure("hibernate.cfg.xml");
+            PhysicalNamingStrategy myStrategy = 
+                    new MyPhysicalNamingStrategy(PhysicalNamingStrategyStandardImpl.INSTANCE, tableName);
+            configuration.setPhysicalNamingStrategy(myStrategy);
+            return configuration.buildSessionFactory();
+        } catch (HibernateException ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+
+    @SuppressWarnings("serial")
+    private static class MyPhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
+        private final PhysicalNamingStrategy parent;
+        private final String newBillsTableName;
+        
+        public MyPhysicalNamingStrategy(PhysicalNamingStrategy parent, String newBillsTableName) {
+            super();
+            this.parent = parent;
+            this.newBillsTableName = newBillsTableName;
+        }
+        
+        @Override
+        public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
+            if (name.getText().equals("Bills_Data")) {
+                return new Identifier(newBillsTableName, false);
+            } else {
+                return name;
+            }
+        } 
+    }
+    
 }
