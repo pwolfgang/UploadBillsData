@@ -83,28 +83,7 @@ public class BillDAO {
     public BillDAO(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-
-    /**
-     * Construct a BillsDataDOA object that is configured from
-     * the hiberante.cfg.xml file that is on the class path, but
-     * change the name of the &quot;Bills_Data&quot; table to a specified
-     * table name. The named table must have the same definition as
-     * the &quot;Bills_Data&quot; table
-     * 
-     * @param tableName The table to store the Bills_Data 
-     */
-    public BillDAO(String tableName) {
-        sessionFactory = UploadBillsData.createSessionFactory(tableName);
-    }
-    
-    /**
-     * Get the session factory
-     * @return the session factory
-     */
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
+   
     /**
      * Method to set one of the committee fields in a bill object
      *
@@ -213,14 +192,6 @@ public class BillDAO {
             session.close();
             session = null;
         }
-    }
-    
-    /**
-     * Method to close the session factory
-     */
-    public void closeSessionFactory() {
-        closeSession();
-        sessionFactory.close();
     }
 
 }
