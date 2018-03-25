@@ -56,11 +56,11 @@ public class BillDAO {
     /**
      * Committee codes
      */
-    private static int[] ctyCodes = {
+    private static final int[] CTY_CODES = {
         101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
         114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
-        127, 130, 201, 202, 203, 205, 208, 209, 210, 211, 212, 213, 214,
-        215, 216, 217, 219, 221, 222, 224, 225, 226, 227, 228, 230};
+        127, 130, 201, 202, 203, 205, 207, 208, 209, 210, 211, 212, 213,
+        214, 215, 216, 217, 219, 221, 222, 224, 225, 226, 227, 228, 230};
 
     /**
      * Hibernate session factory
@@ -92,7 +92,7 @@ public class BillDAO {
      * @param isPrimary True from primary endTransactiontee, false for other endTransactiontees
      * @param value The value to be set
      */
-    public void setCommittee(Bill bill, int ctyCode, boolean isPrimary, Integer value) {
+    public void setCommittee(Bill bill, int ctyCode, boolean isPrimary, Boolean value) {
         String methodName;
         if (ctyCode != 300) {
             methodName = String.format("set$%3d%s", ctyCode, isPrimary ? "p" : "o");
@@ -100,7 +100,7 @@ public class BillDAO {
             methodName = "set$300";
         }
         try {
-            Method method = Bill.class.getMethod(methodName, Integer.class);
+            Method method = Bill.class.getMethod(methodName, Boolean.class);
             method.invoke(bill, value);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             String message = String.format("Error setting committee %d%s in bill %s",
@@ -115,11 +115,11 @@ public class BillDAO {
      * @param bill The Bill object
      */
     public void clearAll(Bill bill) {
-        for (int ctyCode : ctyCodes) {
-            setCommittee(bill, ctyCode, true, 0);
-            setCommittee(bill, ctyCode, false, 0);
+        for (int ctyCode : CTY_CODES) {
+            setCommittee(bill, ctyCode, true, false);
+            setCommittee(bill, ctyCode, false, false);
         }
-        setCommittee(bill, 300, false, 0);
+        setCommittee(bill, 300, false, false);
     }
 
     /**

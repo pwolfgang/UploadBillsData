@@ -31,17 +31,22 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
+import edu.temple.cla.policydb.billshibernatedao.Bill;
 import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.EntityType;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.hibernate.Metamodel;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
@@ -148,6 +153,8 @@ public class UploadBillsData {
         Configuration configuration;
         try {
             configuration = new Configuration().configure("hibernate.cfg.xml");
+            configuration.addAnnotatedClass(edu.temple.cla.policydb.uploadbillsdata.CommitteeAliases.class);
+            configuration.addAnnotatedClass(edu.temple.cla.policydb.billshibernatedao.Bill.class);
             PhysicalNamingStrategy myStrategy
                     = new MyPhysicalNamingStrategy(PhysicalNamingStrategyStandardImpl.INSTANCE, tableName);
             configuration.setPhysicalNamingStrategy(myStrategy);
@@ -177,6 +184,13 @@ public class UploadBillsData {
                 return name;
             }
         }
+    }
+    
+    private static void printMap(Map<? extends Object, Object> map) {
+        map.forEach((k, v)-> {
+            System.out.print(k + " -> ");
+            System.out.println(v);
+        });
     }
 
 }

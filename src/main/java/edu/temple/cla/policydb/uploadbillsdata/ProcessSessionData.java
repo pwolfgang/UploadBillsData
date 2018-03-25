@@ -15,7 +15,6 @@ import edu.temple.cla.policydb.billshibernatedao.Bill;
 import edu.temple.cla.policydb.billshibernatedao.BillDAO;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -48,16 +47,14 @@ public class ProcessSessionData {
             = Pattern.compile("(Re-)?[Cc]ommitted to(.*)");
     private static final Pattern CONFERENCE_PAT
             = Pattern.compile(".*[Cc]onference.*");
-    private final SessionFactory sessionFactory;
     private final BillDAO billDAO;
     private static final Logger LOGGER = Logger.getLogger(ProcessSessionData.class);
     
     public ProcessSessionData(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
         this.billDAO = new BillDAO(sessionFactory);
         committeeCodes = new CommitteeCodes(sessionFactory);
     }
-
+    
     /**
      * A method to process a file. The file is assumed to contain an XML
      * representation of a session as provided by the legislative data
@@ -124,7 +121,7 @@ public class ProcessSessionData {
             chamberNo = 2;
         }
         bill.setChamber(chamberNo);
-        bill.setSession(session);
+        bill.setSession_(session);
         bill.setBill(billString);
         String resource = String.format(ROOT, year, specialSessionNo, chamber, type, billNo);
         bill.setHyperlink("#http://" + PALEG + resource + "#");
@@ -143,12 +140,7 @@ public class ProcessSessionData {
         bill.setAbstract_(title);
         Date dateReferred = findDateReferred(billData);
         if (dateReferred != null) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(dateReferred);
             bill.setDateReferred(dateReferred);
-            bill.setDayReferred(c.get(Calendar.DAY_OF_MONTH));
-            bill.setMonthReferred(c.get(Calendar.MONTH) + 1);
-            bill.setYearReferred(c.get(Calendar.YEAR));
         }
         if (billData.getType().equals("B")) {
             Action actNo = findActNo(billData);
@@ -158,23 +150,13 @@ public class ProcessSessionData {
                 bill.setActNo(actionTaken.substring(lastSpace + 1));
                 Date dateEnacted = actNo.getTheDate();
                 if (dateEnacted != null) {
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(dateEnacted);
                     bill.setDateEnacted(dateEnacted);
-                    bill.setDayEnacted((short) c.get(Calendar.DATE));
-                    bill.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
-                    bill.setYearEnacted((short) c.get(Calendar.YEAR));
                 }
             }
         } else {
             Date dateAdopted = getDateAdopted(billData);
             if (dateAdopted != null) {
-                Calendar c = Calendar.getInstance();
-                c.setTime(dateAdopted);
                 bill.setDateEnacted(dateAdopted);
-                bill.setDayEnacted((short) c.get(Calendar.DATE));
-                bill.setMonthEnacted((short) (c.get(Calendar.MONTH) + 1));
-                bill.setYearEnacted((short) c.get(Calendar.YEAR));
             }
         }
         processHistory(billData, bill);
@@ -222,14 +204,14 @@ public class ProcessSessionData {
         billsData.setSenateLastAction(senateState.getFinalStateCode());
         billsData.setConAmmend((short) conAmendState.getFinalState());
         if (billsData.getConAmmend() != 99 || bill.getType().equals("R")) {
-            billsData.setVetoIneligible(1);
+            billsData.setVetoIneligible(true);
         } else {
-            billsData.setVetoIneligible(0);
-            billsData.setVetoed(governorState.isVetoed() ? 1 : 0);
-            billsData.setVetoOverriden(governorState.isVetoed() && becameLaw ? 1 : 0);
-            billsData.setLineItemVeto(governorState.isLineItemVeto() ? 1 : 0);
-            billsData.setSignedbyGov(governorState.isApprovedByGovernor() ? 1 : 0);
-            billsData.setLawNoGovSig(governorState.isLawNoGovSig() ? 1 : 0);
+            billsData.setVetoIneligible(false);
+            billsData.setVetoed(governorState.isVetoed());
+            billsData.setVetoOverriden(governorState.isVetoed() && becameLaw);
+            billsData.setLineItemVeto(governorState.isLineItemVeto());
+            billsData.setSignedbyGov(governorState.isApprovedByGovernor());
+            billsData.setLawNoGovSig(governorState.isLawNoGovSig());
         }
     }
 
@@ -298,10 +280,10 @@ public class ProcessSessionData {
                 }
                 try {
                     if (ctyCode != null) {
-                        billDAO.setCommittee(bill, ctyCode, primary, 1);
+                        billDAO.setCommittee(bill, ctyCode, primary, true);
                     }
                 } catch (Throwable t) {
-                    String message = "Error processing " + bill.getSession() 
+                    String message = "Error processing " + bill.getSession_() 
                             + " " + bill.getBill() + " ctyCode: " + ctyCode 
                             + " primary: " + primary;
                     LOGGER.error(message, t);
@@ -310,7 +292,7 @@ public class ProcessSessionData {
             }
         }
         if (conferenceCommitteeFound) {
-            billDAO.setCommittee(bill, 300, false, 1);
+            billDAO.setCommittee(bill, 300, false, true);
         }
     }
 
