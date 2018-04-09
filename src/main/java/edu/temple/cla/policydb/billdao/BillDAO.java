@@ -29,22 +29,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.temple.cla.policydb.billshibernatedao;
+package edu.temple.cla.policydb.billdao;
 
-import java.io.Serializable;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.IdentifierGenerator;
+import edu.temple.cla.policydb.dbutilities.ColumnMetaData;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
- * @author Paul
+ * @author Paul Wolfgang
  */
-public class BillIdGen implements IdentifierGenerator {
+public class BillDAO {
     
-    @Override
-    public Serializable generate(SharedSessionContractImplementor session, Object object) {
-        Bill bill = (Bill) object;
-        return bill.getId();
+    private static final Logger LOGGER = Logger.getLogger(BillDAO.class);
+    
+    private final List<String> valueLists;
+    private final List<ColumnMetaData> metadataList;
+    
+    public BillDAO(Statement stmt) {
+        valueLists = new ArrayList<>();
+        metadataList = loadMetaDataList(stmt);
     }
-   
+    
+    private List<ColumnMetaData> loadMetaDataList(Statement stmt) {
+        return new ArrayList<>();
+    }
+    
+    public void updateDatabase() {}
+    
+    public void addToValuesList(Bill bill) {}
+    
 }

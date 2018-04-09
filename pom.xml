@@ -15,6 +15,10 @@
             <id>myxmltest</id>
             <url>https://github.com/pwolfgang/myxmltest/releases</url>
         </repository>
+        <repository>
+            <id>DBUtilities</id>
+            <url>https://github.com/pwolfgang/DBUtilities/releases</url>
+        </repository>           
     </repositories>    
     <build>
         <plugins>
@@ -59,6 +63,11 @@
             <artifactId>myxmltest</artifactId>
             <version>1.0.0</version>
             <scope>test</scope>   
+        </dependency>
+        <dependency>
+            <groupId>edu.temple.cla.policydb</groupId>
+            <artifactId>DBUtilities</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

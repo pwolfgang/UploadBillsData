@@ -31,39 +31,40 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Paul Wolfgang
  */
 public class CommitteeCodes {
+    
+    private static final Logger LOGGER = Logger.getLogger(CommitteeCodes.class);
 
     private final Map<Committee, Short> nameMap =
             new HashMap<>();
 
-    public CommitteeCodes(SessionFactory factory) {
-        Session session = factory.openSession();
-        Transaction tx = session.beginTransaction();
-        @SuppressWarnings("unchecked")
-        List<CommitteeAliases> committeeAliases = session.createQuery("from CommitteeAliases").list();
-        committeeAliases.forEach((committeeAlias) -> {
-            Short ctyCode = committeeAlias.getCtyCode();
-            String ctyName = committeeAlias.getAlternateName();
-            Short chamber = committeeAlias.getChamber();
-            Committee committee = new Committee(chamber, ctyName);
-            nameMap.put(committee, ctyCode);
-        });
-        tx.commit();
-        session.close();    
+    public CommitteeCodes(Statement stmt) {
+        String query = "SELECT * from CommitteeAliases";
+        try (ResultSet rs = stmt.executeQuery(query);) {
+            while (rs.next()) {
+                short ctyCode = rs.getShort("CtyCode");
+                String ctyName = rs.getString("AlternateName");
+                short chamber = rs.getShort("Chanber");
+                Committee committee = new Committee(chamber, ctyName);
+                nameMap.put(committee, ctyCode);
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error reading CommitteeAliases from database ", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
-    public Short get(Committee cty) {
+    public short get(Committee cty) {
         return nameMap.get(cty);
     }
 

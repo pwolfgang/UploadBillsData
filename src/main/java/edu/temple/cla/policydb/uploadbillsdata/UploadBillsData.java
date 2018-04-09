@@ -31,7 +31,7 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
-import edu.temple.cla.policydb.billshibernatedao.Bill;
+import edu.temple.cla.policydb.billdao.Bill;
 import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -154,7 +154,7 @@ public class UploadBillsData {
         try {
             configuration = new Configuration().configure("hibernate.cfg.xml");
             configuration.addAnnotatedClass(edu.temple.cla.policydb.uploadbillsdata.CommitteeAliases.class);
-            configuration.addAnnotatedClass(edu.temple.cla.policydb.billshibernatedao.Bill.class);
+            configuration.addAnnotatedClass(edu.temple.cla.policydb.billdao.Bill.class);
             PhysicalNamingStrategy myStrategy
                     = new MyPhysicalNamingStrategy(PhysicalNamingStrategyStandardImpl.INSTANCE, tableName);
             configuration.setPhysicalNamingStrategy(myStrategy);
