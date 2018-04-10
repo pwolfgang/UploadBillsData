@@ -48,12 +48,15 @@ public class BillDAO {
     private final List<String> valueLists;
     private final List<ColumnMetaData> metadataList;
     
-    public BillDAO(Statement stmt) {
+    public BillDAO(Statement stmt, String tableName) {
         valueLists = new ArrayList<>();
-        metadataList = loadMetaDataList(stmt);
+        metadataList = loadMetaDataList(stmt,tableName);
     }
     
-    private List<ColumnMetaData> loadMetaDataList(Statement stmt) {
+    private List<ColumnMetaData> loadMetaDataList(Statement stmt, String tableName) {
+        String query = "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION"
+                + "FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='PAPolicy' AND TABLE_NAME='"
+                + tableName + "' ORDER_BY ORDINAL_POSITION";
         return new ArrayList<>();
     }
     

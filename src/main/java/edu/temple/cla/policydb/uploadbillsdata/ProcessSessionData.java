@@ -75,10 +75,13 @@ public class ProcessSessionData {
     private static final Pattern CONFERENCE_PAT
             = Pattern.compile(".*[Cc]onference.*");
     private static final Logger LOGGER = Logger.getLogger(ProcessSessionData.class);
-    
-    public ProcessSessionData(Statement stmt) {
+    private final String tableName;
+    private final Statement stmt;
+    public ProcessSessionData(Statement stmt, String tableName) {
+        this.stmt = stmt;
+        this.tableName = tableName;
         committeeCodes = new CommitteeCodes(stmt);
-        billDAO = new BillDAO(stmt);
+        billDAO = new BillDAO(stmt, tableName);
     }
     
     /**
@@ -88,6 +91,7 @@ public class ProcessSessionData {
      * and stored into the database.
      *
      * @param in The input stream containing the file.
+     * @return Set of unknown committees.
      */
     public Set<String> processFile(InputStream in) {
         UNKNOWN_COMMITTEES.clear();
@@ -286,7 +290,7 @@ public class ProcessSessionData {
             Matcher m2 = COMMITTED_PAT.matcher(verb);
             if (m1.matches() || m2.matches()) {
                 String committeeNameString = toTitleCase(a.getCommittee());
-                Short chamber = inHouse ? (short) 1 : (short) 2;
+                short chamber = inHouse ? (short) 1 : (short) 2;
                 Committee committee = new Committee(chamber, committeeNameString);
                 Short ctyCode = committeeCodes.get(committee);
                 if (ctyCode == null) {
@@ -303,7 +307,7 @@ public class ProcessSessionData {
                 }
                 try {
                     if (ctyCode != null) {
-                        billDAO.setCommittee(bill, ctyCode, primary, true);
+                        bill.setCommittee(true, ctyCode, primary);
                     }
                 } catch (Throwable t) {
                     String message = "Error processing " + bill.getSession_() 
@@ -315,7 +319,7 @@ public class ProcessSessionData {
             }
         }
         if (conferenceCommitteeFound) {
-            billDAO.setCommittee(bill, 300, false, true);
+            bill.setCommittee(true, 300, false);
         }
     }
 

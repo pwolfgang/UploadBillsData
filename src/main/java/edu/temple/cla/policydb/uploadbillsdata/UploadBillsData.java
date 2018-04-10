@@ -31,28 +31,20 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
-import edu.temple.cla.policydb.billdao.Bill;
+import edu.temple.cla.policydb.dbutilities.SimpleDataSource;
 import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.EntityType;
+import javax.sql.DataSource;
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Metamodel;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.model.naming.Identifier;
-import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
-import org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 /**
  * This program uploads the Bills Data from the XML files provided by the PA
@@ -64,7 +56,6 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 public class UploadBillsData {
 
     private static final Logger LOGGER = Logger.getLogger(UploadBillsData.class);
-    private static SessionFactory sessionFactory;
     private static ProcessSessionData processSessionData;
     private static final Set<String> UNKNOWN_COMMITTEES = new TreeSet<>();
 
@@ -73,14 +64,21 @@ public class UploadBillsData {
      * Legislative Data Processing Department into the PAPolicy database
      * Bills_Table.
      *
-     * @param args the command line arguments args[0] is the file or directory
-     * containing the XML data args[1] is the name of the table to load the
-     * bills data into. This table must have the same structure as the
-     * Bills_Data table.
+     * @param args
+     * <dl>
+     * <dt>args[0]</dt>
+     * <dd>File or directory containing the XML data.</dd>
+     * <dt>args[1]</dt>
+     * <dd>File containing the datasource properties.</dd< <dt>args[2]</dt>
+     * <dd>Name of the table to load the bills data into. This table must have
+     * the same structure as the Bills_Data table. If omitted, Bills_Data is
+     * used.</dd>
+     * </dl>
      */
     public static void main(String[] args) {
+        String tableName;
         if (args.length < 2) {
-            System.err.println("Usage: UploadBillsData <directory><table>");
+            System.err.println("Usage: UploadBillsData <directory><datasource><table>");
             System.exit(1);
         }
         if (args[0] == null) {
@@ -90,27 +88,36 @@ public class UploadBillsData {
         if (args[1] == null) {
             System.err.println("args[1] must be non null");
         }
-        sessionFactory = createSessionFactory(args[1]);
-        processSessionData = new ProcessSessionData(sessionFactory);
-        File directory = new File(args[0]);
-        processDirectory(directory);
-        System.err.println("Done processing directory");
-        sessionFactory.close();
-        PrintWriter pw3 = null;
-        try {
-            pw3 = new PrintWriter("UnknownCommitees.txt");
-            for (String committee : UNKNOWN_COMMITTEES) {
-                pw3.println(committee);
-            }
-        } catch (FileNotFoundException ioex) {
-            System.err.println("Error creating UnknownCommittees.txt");
-        } finally {
-            if (pw3 != null) {
-                pw3.flush();
-                pw3.close();
-            }
+        if (args[2] != null) {
+            tableName = args[2];
+        } else {
+            tableName = "Bills_Data";
         }
-        System.err.println("Exiting main");
+        DataSource dataSource = new SimpleDataSource(args[1]);
+        try (Connection conn = dataSource.getConnection();) {
+            Statement stmt = conn.createStatement();
+            processSessionData = new ProcessSessionData(stmt, tableName);
+            File directory = new File(args[0]);
+            processDirectory(directory);
+            System.err.println("Done processing directory");
+            PrintWriter pw3 = null;
+            try {
+                pw3 = new PrintWriter("UnknownCommitees.txt");
+                for (String committee : UNKNOWN_COMMITTEES) {
+                    pw3.println(committee);
+                }
+            } catch (FileNotFoundException ioex) {
+                System.err.println("Error creating UnknownCommittees.txt");
+            } finally {
+                if (pw3 != null) {
+                    pw3.flush();
+                    pw3.close();
+                }
+            }
+            System.err.println("Exiting main");
+        } catch (Exception ex) {
+            LOGGER.error("Error uploading bills data", ex);
+        }
     }
 
     /**
@@ -148,49 +155,4 @@ public class UploadBillsData {
             System.exit(1);
         }
     }
-
-    public static final SessionFactory createSessionFactory(String tableName) {
-        Configuration configuration;
-        try {
-            configuration = new Configuration().configure("hibernate.cfg.xml");
-            configuration.addAnnotatedClass(edu.temple.cla.policydb.uploadbillsdata.CommitteeAliases.class);
-            configuration.addAnnotatedClass(edu.temple.cla.policydb.billdao.Bill.class);
-            PhysicalNamingStrategy myStrategy
-                    = new MyPhysicalNamingStrategy(PhysicalNamingStrategyStandardImpl.INSTANCE, tableName);
-            configuration.setPhysicalNamingStrategy(myStrategy);
-            return configuration.buildSessionFactory();
-        } catch (HibernateException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
-
-    @SuppressWarnings("serial")
-    private static class MyPhysicalNamingStrategy extends PhysicalNamingStrategyStandardImpl {
-
-        private final PhysicalNamingStrategy parent;
-        private final String newBillsTableName;
-
-        public MyPhysicalNamingStrategy(PhysicalNamingStrategy parent, String newBillsTableName) {
-            super();
-            this.parent = parent;
-            this.newBillsTableName = newBillsTableName;
-        }
-
-        @Override
-        public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
-            if (name.getText().equals("Bills_Data")) {
-                return new Identifier(newBillsTableName, false);
-            } else {
-                return name;
-            }
-        }
-    }
-    
-    private static void printMap(Map<? extends Object, Object> map) {
-        map.forEach((k, v)-> {
-            System.out.print(k + " -> ");
-            System.out.println(v);
-        });
-    }
-
 }

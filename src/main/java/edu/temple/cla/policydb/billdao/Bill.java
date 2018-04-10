@@ -43,6 +43,15 @@ public class Bill {
     
     private static final Logger LOGGER = Logger.getLogger(Bill.class);
     
+    /**
+     * Committee codes
+     */
+    private static final int[] CTY_CODES = {
+        101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+        114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
+        127, 130, 201, 202, 203, 205, 207, 208, 209, 210, 211, 212, 213,
+        214, 215, 216, 217, 219, 221, 222, 224, 225, 226, 227, 228, 230};
+
     private String id;
     
     private short chamber;
@@ -2157,20 +2166,27 @@ public class Bill {
      * @param primary
      */
     public void setCommittee(boolean value, int committeeCode, boolean primary) {
-        String methodName = String.format("set$%3d", committeeCode) + (primary ? "p":"o");
+        String methodName;
+        if (committeeCode != 300) {
+            methodName = String.format("set$%3d", committeeCode) + (primary ? "p":"o");
+        } else {
+            methodName = "set$300";
+        }
         try {
             Method method = this.getClass().getDeclaredMethod(methodName, boolean.class);
             method.invoke(this, value);
-        } catch (IllegalAccessException | IllegalArgumentException 
-                | NoSuchMethodException | SecurityException 
-                | InvocationTargetException e) {
+        } catch (Exception e) {
                 LOGGER.error("Error setting committee " + methodName, e);
                 throw new RuntimeException(e);
         }
     }
     
     public void clearAll() {
-        
+        for (int ctyCode : CTY_CODES) {
+            setCommittee(false, ctyCode, true);
+            setCommittee(false, ctyCode, false);
+        }
+        setCommittee(false, 300, false);        
     }
     
 }
