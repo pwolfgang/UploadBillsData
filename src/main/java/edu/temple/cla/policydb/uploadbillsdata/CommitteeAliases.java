@@ -31,40 +31,22 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-@Entity
-@Table(name="CommitteeAliases")
-@SuppressWarnings("serial")
-public class CommitteeAliases  implements java.io.Serializable {
+public class CommitteeAliases  {
 
 
-    @Id
-    @Column(name="ID")
-    @GeneratedValue(strategy=IDENTITY)
     private short id;
     
-    @Column(name="CtyCode")
-    private Short ctyCode;
+    private short ctyCode;
     
-    @Column(name="AlternateName")
     private String alternateName;
     
-    @Column(name="StartYear")
-    private Short startYear;
+    private short startYear;
     
-    @Column(name="EndYear")
-    private Short endYear;
+    private short endYear;
     
-    @Column(name="Chamber")
-    private Short chamber;
+    private short chamber;
      
-    @Column(name="Name")
     private String name;
 
     public CommitteeAliases() {
@@ -74,7 +56,8 @@ public class CommitteeAliases  implements java.io.Serializable {
     public CommitteeAliases(short id) {
         this.id = id;
     }
-    public CommitteeAliases(short id, Short ctyCode, String alternateName, Short startYear, Short endYear, Short chamber, String name) {
+    public CommitteeAliases(short id, short ctyCode, String alternateName, 
+            short startYear, short endYear, short chamber, String name) {
        this.id = id;
        this.ctyCode = ctyCode;
        this.alternateName = alternateName;
@@ -91,11 +74,11 @@ public class CommitteeAliases  implements java.io.Serializable {
     public void setId(short id) {
         this.id = id;
     }
-    public Short getCtyCode() {
+    public short getCtyCode() {
         return this.ctyCode;
     }
     
-    public void setCtyCode(Short ctyCode) {
+    public void setCtyCode(short ctyCode) {
         this.ctyCode = ctyCode;
     }
     public String getAlternateName() {
@@ -105,25 +88,25 @@ public class CommitteeAliases  implements java.io.Serializable {
     public void setAlternateName(String alternateName) {
         this.alternateName = alternateName;
     }
-    public Short getStartYear() {
+    public short getStartYear() {
         return this.startYear;
     }
     
-    public void setStartYear(Short startYear) {
+    public void setStartYear(short startYear) {
         this.startYear = startYear;
     }
-    public Short getEndYear() {
+    public short getEndYear() {
         return this.endYear;
     }
     
-    public void setEndYear(Short endYear) {
+    public void setEndYear(short endYear) {
         this.endYear = endYear;
     }
-    public Short getChamber() {
+    public short getChamber() {
         return this.chamber;
     }
     
-    public void setChamber(Short chamber) {
+    public void setChamber(short chamber) {
         this.chamber = chamber;
     }
     public String getName() {
