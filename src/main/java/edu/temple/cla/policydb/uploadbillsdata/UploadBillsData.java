@@ -95,8 +95,7 @@ public class UploadBillsData {
         }
         DataSource dataSource = new SimpleDataSource(args[1]);
         try (Connection conn = dataSource.getConnection();) {
-            Statement stmt = conn.createStatement();
-            processSessionData = new ProcessSessionData(stmt, tableName);
+            processSessionData = new ProcessSessionData(conn, tableName);
             File directory = new File(args[0]);
             processDirectory(directory);
             System.err.println("Done processing directory");

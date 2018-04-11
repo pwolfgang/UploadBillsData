@@ -31,6 +31,7 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -48,9 +49,10 @@ public class CommitteeCodes {
     private final Map<Committee, Short> nameMap =
             new HashMap<>();
 
-    public CommitteeCodes(Statement stmt) {
+    public CommitteeCodes(Connection conn) {
         String query = "SELECT * from CommitteeAliases";
-        try (ResultSet rs = stmt.executeQuery(query);) {
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query);) {
             while (rs.next()) {
                 short ctyCode = rs.getShort("CtyCode");
                 String ctyName = rs.getString("AlternateName");

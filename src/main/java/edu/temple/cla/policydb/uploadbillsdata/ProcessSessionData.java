@@ -41,6 +41,9 @@ import edu.temple.cla.policydb.billdao.Bill;
 import edu.temple.cla.policydb.billdao.BillDAO;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.Set;
@@ -76,12 +79,12 @@ public class ProcessSessionData {
             = Pattern.compile(".*[Cc]onference.*");
     private static final Logger LOGGER = Logger.getLogger(ProcessSessionData.class);
     private final String tableName;
-    private final Statement stmt;
-    public ProcessSessionData(Statement stmt, String tableName) {
-        this.stmt = stmt;
+    private final Connection conn;
+    public ProcessSessionData(Connection conn, String tableName) {
+        this.conn = conn;
         this.tableName = tableName;
-        committeeCodes = new CommitteeCodes(stmt);
-        billDAO = new BillDAO(stmt, tableName);
+        committeeCodes = new CommitteeCodes(conn);
+        billDAO = new BillDAO(conn, tableName);
     }
     
     /**

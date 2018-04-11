@@ -2177,7 +2177,7 @@ public class Bill {
             method.invoke(this, value);
         } catch (Exception e) {
                 LOGGER.error("Error setting committee " + methodName, e);
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error setting committee " + methodName, e);
         }
     }
     

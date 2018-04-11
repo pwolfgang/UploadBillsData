@@ -32,7 +32,9 @@
 package edu.temple.cla.policydb.billdao;
 
 import edu.temple.cla.policydb.dbutilities.ColumnMetaData;
-import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -42,26 +44,31 @@ import org.apache.log4j.Logger;
  * @author Paul Wolfgang
  */
 public class BillDAO {
-    
+
     private static final Logger LOGGER = Logger.getLogger(BillDAO.class);
-    
+
     private final List<String> valueLists;
-    private final List<ColumnMetaData> metadataList;
-    
-    public BillDAO(Statement stmt, String tableName) {
+    private List<ColumnMetaData> metadataList = null;
+    private final Connection conn;
+
+    public BillDAO(Connection conn, String tableName) {
+        this.conn = conn;
         valueLists = new ArrayList<>();
-        metadataList = loadMetaDataList(stmt,tableName);
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = metaData.getColumns(null, "PAPolicy", "SupremeCourt", null)) {
+                metadataList = ColumnMetaData.getColumnMetaDataList(rs);
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error loading metadata", ex);
+            throw new RuntimeException("Error loading metadata", ex);
+        }
     }
-    
-    private List<ColumnMetaData> loadMetaDataList(Statement stmt, String tableName) {
-        String query = "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION"
-                + "FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='PAPolicy' AND TABLE_NAME='"
-                + tableName + "' ORDER_BY ORDINAL_POSITION";
-        return new ArrayList<>();
+
+    public void updateDatabase() {
     }
-    
-    public void updateDatabase() {}
-    
-    public void addToValuesList(Bill bill) {}
-    
+
+    public void addToValuesList(Bill bill) {
+    }
+
 }
