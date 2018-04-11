@@ -30,8 +30,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package edu.temple.cla.policydb.billdao;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
@@ -2323,6 +2326,27 @@ public class Bill implements java.io.Serializable {
             setCommittee(false, ctyCode, false);
         }
         setCommittee(false, 300, false);        
+    }
+
+    public Map<String, Object> buildFieldMap() {
+        try {
+            Map<String, Object> theMap = new LinkedHashMap<>();
+            Class<?> billClass = this.getClass();
+            Field[] fields = billClass.getDeclaredFields();
+            for (Field field : fields) {
+                Column column = field.getAnnotation(Column.class);
+                if (column != null) {
+                    String columnName = column.name();
+                    field.setAccessible(true);
+                    Object value = field.get(this);
+                    theMap.put(columnName, value);
+                }
+            }
+            return theMap;
+        } catch (Exception ex) {
+            LOGGER.error("Error building field map", ex);
+            throw new RuntimeException("Error building field map", ex);
+        }
     }
     
 }

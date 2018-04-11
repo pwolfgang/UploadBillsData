@@ -31,10 +31,14 @@
  */
 package edu.temple.cla.policydb.billdao;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  *
  * @author Paul
  */
+@Retention(RetentionPolicy.RUNTIME)
 @interface Column {
     String name(); 
 }
