@@ -56,7 +56,7 @@ public class CommitteeCodes {
             while (rs.next()) {
                 short ctyCode = rs.getShort("CtyCode");
                 String ctyName = rs.getString("AlternateName");
-                short chamber = rs.getShort("Chanber");
+                short chamber = rs.getShort("Chamber");
                 Committee committee = new Committee(chamber, ctyName);
                 nameMap.put(committee, ctyCode);
             }

@@ -2304,7 +2304,7 @@ public class Bill implements java.io.Serializable {
      * @param committeeCode
      * @param primary
      */
-    public void setCommittee(boolean value, int committeeCode, boolean primary) {
+    public void setCommittee(Boolean value, int committeeCode, boolean primary) {
         String methodName;
         if (committeeCode != 300) {
             methodName = String.format("set$%3d", committeeCode) + (primary ? "p":"o");
@@ -2312,7 +2312,7 @@ public class Bill implements java.io.Serializable {
             methodName = "set$300";
         }
         try {
-            Method method = this.getClass().getDeclaredMethod(methodName, boolean.class);
+            Method method = this.getClass().getDeclaredMethod(methodName, Boolean.class);
             method.invoke(this, value);
         } catch (Exception e) {
                 LOGGER.error("Error setting committee " + methodName, e);

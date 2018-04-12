@@ -32,11 +32,14 @@
 package edu.temple.cla.policydb.billdao;
 
 import edu.temple.cla.policydb.dbutilities.ColumnMetaData;
+import edu.temple.cla.policydb.dbutilities.DBUtil;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.util.ArrayList;
+import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 import org.apache.log4j.Logger;
 
 /**
@@ -47,16 +50,18 @@ public class BillDAO {
 
     private static final Logger LOGGER = Logger.getLogger(BillDAO.class);
 
-    private final List<String> valueLists;
+    private final StringJoiner valuesList;
     private List<ColumnMetaData> metadataList = null;
     private final Connection conn;
+    private final String tableName;
 
     public BillDAO(Connection conn, String tableName) {
         this.conn = conn;
-        valueLists = new ArrayList<>();
+        this.tableName = tableName;
+        valuesList = new StringJoiner(",\n");
         try {
             DatabaseMetaData metaData = conn.getMetaData();
-            try (ResultSet rs = metaData.getColumns(null, "PAPolicy", "SupremeCourt", null)) {
+            try (ResultSet rs = metaData.getColumns(null, "PAPolicy", tableName, null)) {
                 metadataList = ColumnMetaData.getColumnMetaDataList(rs);
             }
         } catch (Exception ex) {
@@ -66,9 +71,19 @@ public class BillDAO {
     }
 
     public void updateDatabase() {
+        String insert = DBUtil.buildSqlInsertStatement(tableName, metadataList);
+        String query = insert + "\n" + valuesList.toString();
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (Exception ex) {
+            LOGGER.error("Error updating database " + query, ex);
+        }
+        
     }
 
     public void addToValuesList(Bill bill) {
+        Map<String, Object> billFieldMap = bill.buildFieldMap();
+        valuesList.add(DBUtil.buildValuesList(billFieldMap, metadataList));
     }
 
 }
