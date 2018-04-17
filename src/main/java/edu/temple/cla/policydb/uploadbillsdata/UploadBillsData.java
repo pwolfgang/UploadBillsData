@@ -31,22 +31,20 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
-import edu.temple.cla.policydb.billshibernatedao.Bill;
 import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.EntityType;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.hibernate.Metamodel;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
@@ -73,10 +71,17 @@ public class UploadBillsData {
      * Legislative Data Processing Department into the PAPolicy database
      * Bills_Table.
      *
-     * @param args the command line arguments args[0] is the file or directory
-     * containing the XML data args[1] is the name of the table to load the
-     * bills data into. This table must have the same structure as the
-     * Bills_Data table.
+     * @param args
+     * <dl>
+     * <dt>args[0]</dt>
+     * <dd>File or directory containing the XML data.</dd>
+     * <dt>args[1]</dt>
+     * <dd>File containing the datasource properties.</dd>
+     * <dt>args[2]</dt>
+     * <dd>Name of the table to load the bills data into. This table must have
+     * the same structure as the Bills_Data table. If omitted, Bills_Data is
+     * used.</dd>
+     * </dl>
      */
     public static void main(String[] args) {
         if (args.length < 2) {
@@ -115,10 +120,10 @@ public class UploadBillsData {
 
     /**
      * Method to recursively scan directories. If a file is found, it is passed
-     * to processFile, otherwise the directory is recursively scanned.
+     * to processFile, otherwise the directory is recursively scanned. If the
+     * file is a zip file, each entry is processed.
      *
      * @param file The directory to scan
-     * @throws Exception
      */
     private static void processDirectory(File file) {
         try {
@@ -128,16 +133,7 @@ public class UploadBillsData {
                     processDirectory(child);
                 }
             } else if (ZipEntryInputStream.isZipFile(file)) {
-                try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file))) {
-                    ZipEntry entry;
-                    while ((entry = zipInputStream.getNextEntry()) != null) {
-                        System.err.println("Processing " + entry);
-                        Set<String> unknownCommittees
-                                = processSessionData.processFile(new ZipEntryInputStream(zipInputStream));
-                        UNKNOWN_COMMITTEES.addAll(unknownCommittees);
-                        System.err.println("Done " + entry);
-                    }
-                }
+                processZipEntryStream(new FileInputStream(file));
             } else {
                 Set<String> unknownCommittees
                         = processSessionData.processFile(new FileInputStream(file));
@@ -148,6 +144,7 @@ public class UploadBillsData {
             System.exit(1);
         }
     }
+
 
     public static final SessionFactory createSessionFactory(String tableName) {
         Configuration configuration;
@@ -193,4 +190,31 @@ public class UploadBillsData {
         });
     }
 
+    /**
+     * Method to process a zip file. Each entry in the zip file is processed.
+     * If the entry is a zip file, this method is recursively called.
+     * @param in The input stream that has been determined to be a zip file.
+     */
+    private static void processZipEntryStream(InputStream in) {
+        ZipInputStream zipInputStream = new ZipInputStream(in);
+        ZipEntry entry = null;
+        try {
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                System.out.println("Processing entry " + entry);
+                BufferedInputStream zipEntry = new BufferedInputStream(new ZipEntryInputStream(zipInputStream));
+                if (ZipEntryInputStream.isZipEntry(zipEntry)) {
+                    System.out.println("Found nested zip file");
+                    processZipEntryStream(zipEntry);
+                } else {
+                    Set<String> unknownCommittees = processSessionData.processFile(zipEntry);
+                    UNKNOWN_COMMITTEES.addAll(unknownCommittees);
+                    System.err.println("Done " + entry);
+                }
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error processing zip entry " + entry, ex);
+            throw new RuntimeException("Error processing zip entry " + entry, ex);
+        }
+
+    }
 }
