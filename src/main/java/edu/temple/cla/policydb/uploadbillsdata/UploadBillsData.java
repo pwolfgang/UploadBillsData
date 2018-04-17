@@ -31,18 +31,13 @@
  */
 package edu.temple.cla.policydb.uploadbillsdata;
 
-import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
@@ -132,11 +127,9 @@ public class UploadBillsData {
                 for (File child : children) {
                     processDirectory(child);
                 }
-            } else if (ZipEntryInputStream.isZipFile(file)) {
-                processZipEntryStream(new FileInputStream(file));
             } else {
                 Set<String> unknownCommittees
-                        = processSessionData.processFile(new FileInputStream(file));
+                        = processSessionData.processStream(new FileInputStream(file));
                 UNKNOWN_COMMITTEES.addAll(unknownCommittees);
             }
         } catch (Exception ex) {
@@ -144,7 +137,6 @@ public class UploadBillsData {
             System.exit(1);
         }
     }
-
 
     public static final SessionFactory createSessionFactory(String tableName) {
         Configuration configuration;
@@ -190,31 +182,4 @@ public class UploadBillsData {
         });
     }
 
-    /**
-     * Method to process a zip file. Each entry in the zip file is processed.
-     * If the entry is a zip file, this method is recursively called.
-     * @param in The input stream that has been determined to be a zip file.
-     */
-    private static void processZipEntryStream(InputStream in) {
-        ZipInputStream zipInputStream = new ZipInputStream(in);
-        ZipEntry entry = null;
-        try {
-            while ((entry = zipInputStream.getNextEntry()) != null) {
-                System.out.println("Processing entry " + entry);
-                BufferedInputStream zipEntry = new BufferedInputStream(new ZipEntryInputStream(zipInputStream));
-                if (ZipEntryInputStream.isZipEntry(zipEntry)) {
-                    System.out.println("Found nested zip file");
-                    processZipEntryStream(zipEntry);
-                } else {
-                    Set<String> unknownCommittees = processSessionData.processFile(zipEntry);
-                    UNKNOWN_COMMITTEES.addAll(unknownCommittees);
-                    System.err.println("Done " + entry);
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.error("Error processing zip entry " + entry, ex);
-            throw new RuntimeException("Error processing zip entry " + entry, ex);
-        }
-
-    }
 }
