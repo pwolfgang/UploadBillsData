@@ -39,6 +39,8 @@ import edu.temple.cla.policydb.billdata.GovernorState;
 import edu.temple.cla.policydb.billdata.Sponsor;
 import edu.temple.cla.policydb.billdao.Bill;
 import edu.temple.cla.policydb.billdao.BillDAO;
+import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -48,6 +50,8 @@ import java.util.StringJoiner;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -83,9 +87,37 @@ public class ProcessSessionData {
         committeeCodes = new CommitteeCodes(conn);
         billDAO = new BillDAO(conn, tableName);
     }
+
+    /**
+     * Method to process possibly compressed stream. If comprressed, each
+     * entry in the zip file is processed. If the entry is a zip file, this 
+     * method is recursively called.
+     * @param in The input stream that may be a zip file.
+     */
+    public Set<String> processStream(InputStream in) {
+        BufferedInputStream bufferedStream = new BufferedInputStream(in);
+        ZipEntry entry = null;
+        try {
+            if (!ZipEntryInputStream.isZipEntry(bufferedStream)) {
+                return processUncompressedStream(bufferedStream);
+            } else {
+                ZipInputStream zipInputStream = new ZipInputStream(bufferedStream);
+                Set<String> unknownCommittees = new TreeSet<>();
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    LOGGER.info("Processing entry " + entry);
+                    unknownCommittees.addAll(processStream(zipInputStream));
+                }
+                return unknownCommittees;
+            }
+        } catch (Exception ex) {
+            LOGGER.error("Error processing zip entry " + entry, ex);
+            throw new RuntimeException("Error processing zip entry " + entry, ex);
+        }
+    }
+
     
     /**
-     * A method to process a file. The file is assumed to contain an XML
+     * A method to process a stream. The file is assumed to contain an XML
      * representation of a session as provided by the legislative data
      * processing service. Each billData element is converted a Bill object
      * and stored into the database.
@@ -93,7 +125,7 @@ public class ProcessSessionData {
      * @param in The input stream containing the file.
      * @return Set of unknown committees.
      */
-    public Set<String> processFile(InputStream in) {
+    private Set<String> processUncompressedStream(InputStream in) {
         UNKNOWN_COMMITTEES.clear();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

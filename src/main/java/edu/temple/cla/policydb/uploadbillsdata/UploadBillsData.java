@@ -32,17 +32,11 @@
 package edu.temple.cla.policydb.uploadbillsdata;
 
 import edu.temple.cla.policydb.dbutilities.SimpleDataSource;
-import edu.temple.cla.policydb.zipentrystream.ZipEntryInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 
@@ -69,7 +63,8 @@ public class UploadBillsData {
      * <dt>args[0]</dt>
      * <dd>File or directory containing the XML data.</dd>
      * <dt>args[1]</dt>
-     * <dd>File containing the datasource properties.</dd< <dt>args[2]</dt>
+     * <dd>File containing the datasource properties.</dd>
+     * <dt>args[2]</dt>
      * <dd>Name of the table to load the bills data into. This table must have
      * the same structure as the Bills_Data table. If omitted, Bills_Data is
      * used.</dd>
@@ -121,10 +116,10 @@ public class UploadBillsData {
 
     /**
      * Method to recursively scan directories. If a file is found, it is passed
-     * to processFile, otherwise the directory is recursively scanned.
+     * to processFile, otherwise the directory is recursively scanned. If the
+     * file is a zip file, each entry is processed.
      *
      * @param file The directory to scan
-     * @throws Exception
      */
     private static void processDirectory(File file) {
         try {
@@ -133,20 +128,9 @@ public class UploadBillsData {
                 for (File child : children) {
                     processDirectory(child);
                 }
-            } else if (ZipEntryInputStream.isZipFile(file)) {
-                try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(file))) {
-                    ZipEntry entry;
-                    while ((entry = zipInputStream.getNextEntry()) != null) {
-                        System.err.println("Processing " + entry);
-                        Set<String> unknownCommittees
-                                = processSessionData.processFile(new ZipEntryInputStream(zipInputStream));
-                        UNKNOWN_COMMITTEES.addAll(unknownCommittees);
-                        System.err.println("Done " + entry);
-                    }
-                }
             } else {
                 Set<String> unknownCommittees
-                        = processSessionData.processFile(new FileInputStream(file));
+                        = processSessionData.processStream(new FileInputStream(file));
                 UNKNOWN_COMMITTEES.addAll(unknownCommittees);
             }
         } catch (Exception ex) {
