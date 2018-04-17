@@ -37,10 +37,10 @@ package edu.temple.cla.policydb.uploadbillsdata;
  */
 public class Committee implements Comparable<Committee> {
 
-    private final Short chamber;
+    private final short chamber;
     private final String name;
 
-    public Committee(Short chamber, String name) {
+    public Committee(short chamber, String name) {
         this.chamber = chamber;
         this.name = name;
     }
@@ -48,7 +48,7 @@ public class Committee implements Comparable<Committee> {
     /**
      * @return the chamber
      */
-    public Short getChamber() {
+    public short getChamber() {
         return chamber;
     }
 
@@ -61,7 +61,7 @@ public class Committee implements Comparable<Committee> {
 
     @Override
     public int compareTo(Committee other) {
-        int compareChamber = chamber.compareTo(other.chamber);
+        int compareChamber = Short.compare(chamber, other.chamber);
         if (compareChamber != 0) return compareChamber;
         return name.compareTo(other.name);
     }
@@ -72,7 +72,7 @@ public class Committee implements Comparable<Committee> {
         if (o == this) return true;
         if (o.getClass() == this.getClass()) {
             Committee other = (Committee) o;
-            return (chamber.equals(other.chamber)
+            return (chamber == other.chamber
                     && name.equals(other.name));
         } else {
             return false;
@@ -81,7 +81,7 @@ public class Committee implements Comparable<Committee> {
 
     @Override
     public int hashCode() {
-        return chamber.hashCode() * 31 + name.hashCode();
+        return toString().hashCode();
     }
 
     @Override

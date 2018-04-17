@@ -29,29 +29,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.temple.cla.policydb.billshibernatedao;
+package edu.temple.cla.policydb.billdao;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.SEQUENCE;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import org.hibernate.annotations.GenericGenerator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  * Model of a Bill as it appears in the Bills_Data table.
  * @author Paul
  */
-@Entity
-@Table(name="Bills_Data")
 @SuppressWarnings("serial")
 public class Bill implements java.io.Serializable {
     
-    @Id
-    @GenericGenerator(name="bill_id_gen", strategy="edu.temple.cla.policydb.billshibernatedao.BillIdGen")
-    @GeneratedValue(generator="bill_id_gen", strategy=SEQUENCE)
+    private static final Logger LOGGER = Logger.getLogger(Bill.class);
+    
+    /**
+     * Committee codes
+     */
+    private static final int[] CTY_CODES = {
+        101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113,
+        114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
+        127, 130, 201, 202, 203, 205, 207, 208, 209, 210, 211, 212, 213,
+        214, 215, 216, 217, 219, 221, 222, 224, 225, 226, 227, 228, 230};
+
     @Column(name="ID")
     private String id;
     
@@ -99,7 +102,6 @@ public class Bill implements java.io.Serializable {
     private String actNo;
      
     @Column(name="Date_Enacted")
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateEnacted;
 
     @Column(name="Code")
@@ -454,7 +456,6 @@ public class Bill implements java.io.Serializable {
     private Boolean petition;
      
     @Column(name="Date_Referred")
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateReferred;
      
     @Column(name="SignedbyGov")
@@ -2295,6 +2296,57 @@ public class Bill implements java.io.Serializable {
      */
     public void set$130o(Boolean $130o) {
         this.$130o = $130o;
+    }
+    
+    /**
+     * Set committee
+     * @param value
+     * @param committeeCode
+     * @param primary
+     */
+    public void setCommittee(Boolean value, int committeeCode, boolean primary) {
+        String methodName;
+        if (committeeCode != 300) {
+            methodName = String.format("set$%3d", committeeCode) + (primary ? "p":"o");
+        } else {
+            methodName = "set$300";
+        }
+        try {
+            Method method = this.getClass().getDeclaredMethod(methodName, Boolean.class);
+            method.invoke(this, value);
+        } catch (Exception e) {
+                LOGGER.error("Error setting committee " + methodName, e);
+                throw new RuntimeException("Error setting committee " + methodName, e);
+        }
+    }
+    
+    public void clearAll() {
+        for (int ctyCode : CTY_CODES) {
+            setCommittee(false, ctyCode, true);
+            setCommittee(false, ctyCode, false);
+        }
+        setCommittee(false, 300, false);        
+    }
+
+    public Map<String, Object> buildFieldMap() {
+        try {
+            Map<String, Object> theMap = new LinkedHashMap<>();
+            Class<?> billClass = this.getClass();
+            Field[] fields = billClass.getDeclaredFields();
+            for (Field field : fields) {
+                Column column = field.getAnnotation(Column.class);
+                if (column != null) {
+                    String columnName = column.name();
+                    field.setAccessible(true);
+                    Object value = field.get(this);
+                    theMap.put(columnName, value);
+                }
+            }
+            return theMap;
+        } catch (Exception ex) {
+            LOGGER.error("Error building field map", ex);
+            throw new RuntimeException("Error building field map", ex);
+        }
     }
     
 }

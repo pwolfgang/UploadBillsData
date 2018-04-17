@@ -29,22 +29,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.temple.cla.policydb.billshibernatedao;
+package edu.temple.cla.policydb.billdao;
 
-import java.io.Serializable;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.IdentifierGenerator;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  *
  * @author Paul
  */
-public class BillIdGen implements IdentifierGenerator {
-    
-    @Override
-    public Serializable generate(SharedSessionContractImplementor session, Object object) {
-        Bill bill = (Bill) object;
-        return bill.getId();
-    }
-   
+@Retention(RetentionPolicy.RUNTIME)
+@interface Column {
+    String name(); 
 }

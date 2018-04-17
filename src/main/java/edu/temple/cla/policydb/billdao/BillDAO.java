@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (c) 2018, Temple University
  * All rights reserved.
  *
@@ -29,45 +29,61 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package edu.temple.cla.policydb.uploadbillsdata;
+package edu.temple.cla.policydb.billdao;
 
+import edu.temple.cla.policydb.dbutilities.ColumnMetaData;
+import edu.temple.cla.policydb.dbutilities.DBUtil;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Paul Wolfgang
  */
-public class CommitteeCodes {
-    
-    private static final Logger LOGGER = Logger.getLogger(CommitteeCodes.class);
+public class BillDAO {
 
-    private final Map<Committee, Short> nameMap =
-            new HashMap<>();
+    private static final Logger LOGGER = Logger.getLogger(BillDAO.class);
 
-    public CommitteeCodes(Connection conn) {
-        String query = "SELECT * from CommitteeAliases";
-        try (Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query);) {
-            while (rs.next()) {
-                short ctyCode = rs.getShort("CtyCode");
-                String ctyName = rs.getString("AlternateName");
-                short chamber = rs.getShort("Chamber");
-                Committee committee = new Committee(chamber, ctyName);
-                nameMap.put(committee, ctyCode);
+    private final StringJoiner valuesList;
+    private List<ColumnMetaData> metadataList = null;
+    private final Connection conn;
+    private final String tableName;
+
+    public BillDAO(Connection conn, String tableName) {
+        this.conn = conn;
+        this.tableName = tableName;
+        valuesList = new StringJoiner(",\n");
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = metaData.getColumns(null, "PAPolicy", tableName, null)) {
+                metadataList = ColumnMetaData.getColumnMetaDataList(rs);
             }
         } catch (Exception ex) {
-            LOGGER.error("Error reading CommitteeAliases from database ", ex);
-            throw new RuntimeException(ex);
+            LOGGER.error("Error loading metadata", ex);
+            throw new RuntimeException("Error loading metadata", ex);
         }
     }
 
-    public short get(Committee cty) {
-        return nameMap.get(cty);
+    public void updateDatabase() {
+        String insert = DBUtil.buildSqlInsertStatement(tableName, metadataList);
+        String query = insert + "\n" + valuesList.toString();
+        try (Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(query);
+        } catch (Exception ex) {
+            LOGGER.error("Error updating database " + query, ex);
+        }
+        
+    }
+
+    public void addToValuesList(Bill bill) {
+        Map<String, Object> billFieldMap = bill.buildFieldMap();
+        valuesList.add(DBUtil.buildValuesList(billFieldMap, metadataList));
     }
 
 }

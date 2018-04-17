@@ -16,6 +16,10 @@
             <url>https://github.com/pwolfgang/myxmltest/releases</url>
         </repository>
         <repository>
+            <id>DBUtilities</id>
+            <url>https://github.com/pwolfgang/DBUtilities/releases</url>
+        </repository>
+        <repository>
             <id>zipentrystream</id>
             <url>https://github.com/pwolfgang/ZipEntryStream/releases</url>
         </repository>
@@ -70,12 +74,6 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.2.12.Final</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
@@ -92,6 +90,11 @@
             <groupId>edu.temple.cla.policydb</groupId>
             <artifactId>zipentrystream</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.temple.cla.policydb</groupId>
+            <artifactId>DBUtilities</artifactId>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
