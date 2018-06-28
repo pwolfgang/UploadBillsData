@@ -77,7 +77,7 @@ public class Action {
      */
     private Date theDate;
     /**
-     * Printer&apos;s numbers acted upon
+     * Printer&#39;s numbers acted upon
      */
     private String printersNumber;
     /**

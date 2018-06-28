@@ -5,7 +5,6 @@
 
 package edu.temple.cla.policydb.billdata;
 
-import edu.temple.cla.policydb.billdata.BillData;
 import edu.templecla.policydb.myxmltest.TestElementFactory;
 import org.junit.After;
 import org.junit.AfterClass;

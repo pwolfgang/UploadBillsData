@@ -61,12 +61,12 @@ public class Sponsor {
 
     /**
      * Construct a Sponsor with all data fields
-     * @param sequenceNumber
-     * @param fillSequence
-     * @param party
-     * @param body
-     * @param districtNumber
-     * @param name
+     * @param sequenceNumber Assigned by PA Legislative Data Processing Service
+     * @param fillSequence Assigned by PA Legislative Data Processing Service
+     * @param party The sponsor&#39;s party.
+     * @param body The chamber (house or senate)
+     * @param districtNumber The legislative district
+     * @param name The sponsor&#39;s name
      */
      public Sponsor(String sequenceNumber, String fillSequence, String party,
             String body, String districtNumber, String name) {

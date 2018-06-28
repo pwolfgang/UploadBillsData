@@ -89,10 +89,11 @@ public class ProcessSessionData {
     }
 
     /**
-     * Method to process possibly compressed stream. If comprressed, each
+     * Method to process possibly compressed stream. If compressed, each
      * entry in the zip file is processed. If the entry is a zip file, this 
      * method is recursively called.
      * @param in The input stream that may be a zip file.
+     * @return The set of unknown committees encountered while processing.
      */
     public Set<String> processStream(InputStream in) {
         BufferedInputStream bufferedStream = new BufferedInputStream(in);
@@ -146,7 +147,7 @@ public class ProcessSessionData {
     /**
      * Process a node in the XML Dom.
      * If this node is a billData element, it is passed to processBill.
-     * @param node
+     * @param node The node in the XML Dom.
      */
     private void processNode(Node node) {
         if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals("bill")) {
@@ -230,7 +231,7 @@ public class ProcessSessionData {
      * the resolution was introduced.
      *
      * @param bill The billData
-     * @returns the date the bill was first referred to a committee.
+     * @return the date the bill was first referred to a committee.
      */
 
     private Date findDateReferred(BillData bill) {

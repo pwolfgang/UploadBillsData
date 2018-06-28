@@ -2299,10 +2299,10 @@ public class Bill implements java.io.Serializable {
     }
     
     /**
-     * Set committee
-     * @param value
-     * @param committeeCode
-     * @param primary
+     * Set committee.
+     * @param value True if this bill was referred to this committee
+     * @param committeeCode The committee code.
+     * @param primary True if this is the first committee to receive this bill.
      */
     public void setCommittee(Boolean value, int committeeCode, boolean primary) {
         String methodName;
