@@ -20,15 +20,15 @@
     <repositories>
         <repository>
             <id>myxmltest</id>
-            <url>https://github.com/pwolfgang/myxmltest/releases</url>
+            <url>https://raw.github.com/pwolfgang/myxmltest/mvn-repo</url>
         </repository>
         <repository>
             <id>DBUtilities</id>
-            <url>https://github.com/pwolfgang/DBUtilities/releases</url>
+            <url>https://raw.github.com/pwolfgang/DBUtilities/mvn-repo</url>
         </repository>
         <repository>
             <id>zipentrystream</id>
-            <url>https://github.com/pwolfgang/ZipEntryStream/releases</url>
+            <url>https://raw.github.com/pwolfgang/ZipEntryStream/mvn-repo</url>
         </repository>
     </repositories>    
     <build>
@@ -102,7 +102,7 @@
                         <include>**/*</include>
                     </includes>
                     <server>github</server>
-                    <repositoryName>TextToolsUtil</repositoryName>      <!-- github repo name -->
+                    <repositoryName>UploadBillsData</repositoryName>      <!-- github repo name -->
                     <repositoryOwner>pwolfgang</repositoryOwner>    <!-- github username  -->
                 </configuration>
                 <executions>
@@ -121,7 +121,7 @@
         <dependency>
             <groupId>edu.temple.cla.policydb</groupId>
             <artifactId>myxmltest</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>   
         </dependency>
         <dependency>
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>edu.temple.cla.policydb</groupId>
             <artifactId>DBUtilities</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
