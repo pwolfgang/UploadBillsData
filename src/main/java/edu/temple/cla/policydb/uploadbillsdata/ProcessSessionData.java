@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  */
 public class ProcessSessionData {
     private final  CommitteeCodes committeeCodes;
-    private final BillDAO billDAO;
+    private BillDAO billDAO;
     private final Set<String> UNKNOWN_COMMITTEES = new TreeSet<>();
     private static final String PALEG = "www.legis.state.pa.us";
     private static final String ROOT = 
@@ -85,7 +85,6 @@ public class ProcessSessionData {
         this.conn = conn;
         this.tableName = tableName;
         committeeCodes = new CommitteeCodes(conn);
-        billDAO = new BillDAO(conn, tableName);
     }
 
     /**
@@ -127,6 +126,7 @@ public class ProcessSessionData {
      * @return Set of unknown committees.
      */
     private Set<String> processUncompressedStream(InputStream in) {
+        billDAO = new BillDAO(conn, tableName);
         UNKNOWN_COMMITTEES.clear();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

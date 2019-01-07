@@ -66,7 +66,7 @@ public class CommitteeCodes {
         }
     }
 
-    public short get(Committee cty) {
+    public Short get(Committee cty) {
         return nameMap.get(cty);
     }
 

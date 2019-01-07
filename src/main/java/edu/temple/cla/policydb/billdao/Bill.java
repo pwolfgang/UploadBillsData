@@ -2305,6 +2305,9 @@ public class Bill implements java.io.Serializable {
      * @param primary True if this is the first committee to receive this bill.
      */
     public void setCommittee(Boolean value, int committeeCode, boolean primary) {
+        if (committeeCode == 199 || committeeCode == 299) {
+            return; // These are non-standard committees and are not tracked.
+        }
         String methodName;
         if (committeeCode != 300) {
             methodName = String.format("set$%3d", committeeCode) + (primary ? "p":"o");
