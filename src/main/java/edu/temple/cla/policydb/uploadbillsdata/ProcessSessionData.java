@@ -173,6 +173,7 @@ public class ProcessSessionData {
         int billNo = billData.getBillNo();
         String chamber = billData.getChamber();
         String type = billData.getType();
+        String subtype = billData.getSubtype();
         String title = billData.getTitle();
         String billString = String.format("%s%s %d", chamber, type, billNo);
         short chamberNo;
@@ -183,6 +184,7 @@ public class ProcessSessionData {
         }
         bill.setChamber(chamberNo);
         bill.setSession_(session);
+        bill.setSubtype(subtype);
         bill.setBill(billString);
         String resource = String.format(ROOT, year, specialSessionNo, chamber, type, billNo);
         bill.setHyperlink("#http://" + PALEG + resource + "#");
