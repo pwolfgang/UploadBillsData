@@ -95,17 +95,17 @@ public class ProcessSessionData {
      * @return The set of unknown committees encountered while processing.
      */
     public Set<String> processStream(InputStream in) {
-        BufferedInputStream bufferedStream = new BufferedInputStream(in);
         ZipEntry entry = null;
-        try {
+        try (BufferedInputStream bufferedStream = new BufferedInputStream(in);) {
             if (!ZipEntryInputStream.isZipEntry(bufferedStream)) {
                 return processUncompressedStream(bufferedStream);
             } else {
                 ZipInputStream zipInputStream = new ZipInputStream(bufferedStream);
+                ZipEntryInputStream zipEntryInputStream = new ZipEntryInputStream(zipInputStream);
                 Set<String> unknownCommittees = new TreeSet<>();
                 while ((entry = zipInputStream.getNextEntry()) != null) {
                     LOGGER.info("Processing entry " + entry);
-                    unknownCommittees.addAll(processStream(zipInputStream));
+                    unknownCommittees.addAll(processStream(zipEntryInputStream));
                 }
                 return unknownCommittees;
             }
