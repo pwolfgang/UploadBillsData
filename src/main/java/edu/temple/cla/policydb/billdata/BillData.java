@@ -162,7 +162,7 @@ public class BillData implements Comparable<BillData> {
                     break;
                 case "title":
                 case "shortTitle":
-                    bill.title = node.getTextContent().trim();
+                    bill.title = Util.convertFromXML(node.getTextContent()).trim();
                     break;
                 case "sponsors":
                     bill.sponsors = getSponsors(node);

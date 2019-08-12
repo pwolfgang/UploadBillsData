@@ -33,6 +33,8 @@ package edu.temple.cla.policydb.billdata;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class to contain static utility methods
@@ -41,21 +43,27 @@ import java.util.Map;
 public class Util {
 
     /** Map between Characters and their XML representation */
-    private static final Map<Character, String> xmlCharMap = new HashMap<Character, String>();
+    private static final Map<Character, String> CHAR_TO_XML_MAP = new HashMap<Character, String>();
+    private static final Map<String, Character> XML_TO_CHAR_MAP = new HashMap<String, Character>();
+    private static final Pattern ENTITY_PATTERN = Pattern.compile("\\&\\#?(\\w+)\\;");
     static {
         String[][] xmlTransTable = new String[][] {
             {"<", "&lt;"},
             {">", "&gt;"},
             {"&", "&amp;"},
             {"\"", "&quot;"},
-            {"'", "&apos;"}};
+            {"'", "&apos;"}
+        };
         for (String[] entry : xmlTransTable) {
-            xmlCharMap.put(entry[0].charAt(0), entry[1]);
+            CHAR_TO_XML_MAP.put(entry[0].charAt(0), entry[1]);
+            XML_TO_CHAR_MAP.put(entry[1], entry[0].charAt(0));
         }
     }
 
     /**
-     * Method to convert string content to XML format.
+     * Method to convert string content to XML/HTML format. Selected special
+     * characters are converted to named entities. Characters whose value is
+     * greater than 127 are converted to the form &amp;#xxx;
      * @param source The source string
      * @return The converted string
      */
@@ -63,7 +71,7 @@ public class Util {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < source.length(); i++) {
             char c = source.charAt(i);
-            String replacement = xmlCharMap.get(c);
+            String replacement = CHAR_TO_XML_MAP.get(c);
             if (replacement != null) {
                 result.append(replacement);
             } else if (c > 127) {
@@ -76,4 +84,34 @@ public class Util {
         return result.toString();
     }
 
+    /**
+     * Method to convert string content to XML/HTML format. Selected named
+     * entities are converted to their corresponding characters. Entities in the
+     * form &amp;#xxx; are converted to their corresponding characters.
+     * @param source The source string
+     * @return The converted string
+     */
+    public static String convertFromXML(String source) {
+        StringBuilder result = new StringBuilder();
+        Matcher m = ENTITY_PATTERN.matcher(source);
+        int index = 0;
+        while (m.find()) {
+            String matched = m.group();
+            Character replacement = XML_TO_CHAR_MAP.get(matched);
+            if (replacement == null) {
+                String codeString = m.group(1);
+                replacement = (char)(Integer.parseInt(codeString));
+            }
+            if (index != m.start()) {
+                result.append(source.substring(index, m.start()));
+            }
+            result.append(replacement);
+            index = m.end();
+        }
+        if (index < source.length()) {
+            result.append(source.substring(index));
+        }
+        return result.toString();
+    }
+    
 }
