@@ -187,7 +187,7 @@ public class ProcessSessionData {
         bill.setSubtype(subtype);
         bill.setBill(billString);
         String resource = String.format(ROOT, year, specialSessionNo, chamber, type, billNo);
-        bill.setHyperlink("#http://" + PALEG + resource + "#");
+        bill.setHyperlink("http://" + PALEG + resource);
         Sponsor[] sponsors = billData.getSponsors();
         if (sponsors.length > 0) {
             Sponsor sponsor = sponsors[0];
